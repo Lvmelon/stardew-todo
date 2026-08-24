@@ -7,44 +7,61 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="今日任务">
-  <meta name="description" content="治愈的像素田园待办清单">
+  <meta name="description" content="治愈、简单、没有压力的像素田园待办清单">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192">
   <link rel="stylesheet" href="styles.css">
   <title>今日任务 · 像素田园待办</title>
 </head>
-<body>
+<body data-time-mood="day" data-season="summer" data-weather="clear">
   <div id="backdrop" aria-hidden="true"></div>
+  <div id="atmosphere-layer" aria-hidden="true"><div class="cloud-wash"></div><div class="rain-field"></div><div class="snow-field"></div></div>
   <main id="app-shell">
     <section id="scene-card" aria-label="像素田园今日任务">
       <img id="scene-art" src="assets/scene.webp" alt="像素田园村庄与木质任务公告板">
-
-      <div id="date-cover" aria-label="今天日期">
-        <span id="current-date"></span><span id="current-weekday"></span>
-      </div>
+      <div id="date-cover" aria-label="今天日期"><span id="current-date"></span><span id="current-weekday"></span></div>
       <div id="greeting-cover"><span id="greeting-text">早安，开始今天的任务吧！</span><span aria-hidden="true">♥</span></div>
-
       <section id="task-patch" aria-label="今日任务列表">
         <div id="task-list"></div>
         <button id="overflow-count" class="overflow-link" type="button" hidden></button>
         <div id="empty-state" hidden>今天暂时没有委托哦 🌱</div>
       </section>
-
-      <button id="new-task-button" class="wood-sign" type="button" aria-label="新建任务">＋ 新任务</button>
+      <div id="plant-progress" class="plant-stage plant-stage-0" aria-label="小芽刚刚冒出" title="完成小事，植物会慢慢长大">🌱</div>
+      <div id="share-sync-indicator" class="tiny-status" hidden aria-live="polite"></div>
+      <button id="shared-button" class="wood-sign shared-sign" type="button" aria-label="打开我们的委托">💌 我们的委托</button>
+      <button id="new-task-button" class="wood-sign new-sign" type="button" aria-label="新建任务">＋ 新任务</button>
+      <button id="settings-button" class="wood-sign settings-sign" type="button" aria-label="打开设置">⚙ 设置</button>
     </section>
   </main>
 
   <div id="detail-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="detail-title">
-    <div class="parchment-modal">
+    <div class="parchment-modal detail-modal-card">
       <button class="close-x" type="button" data-close="detail-modal" aria-label="关闭">×</button>
       <div class="modal-kicker">今日委托</div>
       <h2 id="detail-title"></h2>
+      <div id="detail-status" class="task-status-note" hidden></div>
       <div id="detail-desc" class="modal-desc"></div>
       <div id="detail-date" class="detail-date" hidden></div>
-      <div class="modal-actions">
+      <div id="detail-reminder" class="detail-date" hidden></div>
+      <section id="comments-panel" class="comments-panel" hidden aria-labelledby="comments-heading">
+        <h3 id="comments-heading">💌 留言</h3>
+        <div id="comment-list" class="comment-list" aria-live="polite"></div>
+        <form id="comment-form" class="comment-form">
+          <label class="sr-only" for="comment-input">写一条留言</label>
+          <textarea id="comment-input" maxlength="500" rows="2" placeholder="留一张小纸条……"></textarea>
+          <button class="wood-btn secondary" type="submit">贴上留言</button>
+        </form>
+        <div id="comment-error" class="form-error" role="alert"></div>
+      </section>
+      <div class="modal-actions" id="owner-task-actions">
         <button id="complete-task" class="wood-btn primary" type="button">完成任务</button>
         <button id="edit-task" class="wood-btn secondary" type="button">编辑</button>
         <button id="delete-task" class="wood-btn danger" type="button">删除</button>
+        <button class="wood-btn" type="button" data-close="detail-modal">返回</button>
+      </div>
+      <div class="modal-actions" id="shared-task-actions" hidden>
+        <span class="readonly-note">只读委托 · 可以留言，不会改动对方任务</span>
         <button class="wood-btn" type="button" data-close="detail-modal">返回</button>
       </div>
     </div>
@@ -56,40 +73,81 @@
       <div class="modal-kicker">公告板</div>
       <h2 id="editor-heading">新任务</h2>
       <div class="editor-row">
-        <label class="field emoji-field"><span>图标</span><input id="task-emoji-input" maxlength="2" value="📌"></label>
+        <label class="field emoji-field"><span>图标</span><input id="task-emoji-input" maxlength="8" value="📌"></label>
         <label class="field grow"><span>任务名称</span><input id="task-title-input" maxlength="40" required autocomplete="off"></label>
       </div>
       <label class="field"><span>任务描述</span><textarea id="task-desc-input" maxlength="120" rows="3" placeholder="可以留一句提醒……"></textarea></label>
       <label class="field"><span>截止日期（可选）</span><input id="task-date-input" type="date"></label>
+      <label class="field"><span>提醒</span><select id="task-reminder-mode"><option value="none">不提醒</option><option value="default">使用默认提醒时间</option><option value="custom">自定义提醒时间</option></select></label>
+      <label id="custom-reminder-field" class="field" hidden><span>自定义时间</span><input id="task-reminder-at" type="datetime-local"></label>
+      <p id="reminder-help" class="field-help">默认提醒需要先选择截止日期，并在设置中开启。</p>
       <div id="form-error" class="form-error" role="alert"></div>
-      <div class="modal-actions">
-        <button id="save-task" class="wood-btn primary" type="submit">贴到公告板</button>
-        <button class="wood-btn" type="button" data-close="editor-modal">取消</button>
-      </div>
+      <div class="modal-actions"><button id="save-task" class="wood-btn primary" type="submit">贴到公告板</button><button class="wood-btn" type="button" data-close="editor-modal">取消</button></div>
     </form>
   </div>
 
   <div id="delete-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="delete-heading">
-    <div class="parchment-modal small-modal">
-      <h2 id="delete-heading">要移除这条任务吗？</h2>
-      <p>删除后它不会再出现在今日公告板上。</p>
-      <div class="modal-actions">
-        <button id="confirm-delete" class="wood-btn danger" type="button">确认删除</button>
-        <button class="wood-btn" type="button" data-close="delete-modal">取消</button>
-      </div>
-    </div>
+    <div class="parchment-modal small-modal"><h2 id="delete-heading">要移除这条任务吗？</h2><p>删除后它不会再出现在公告板上，历史留言会保留。</p><div class="modal-actions"><button id="confirm-delete" class="wood-btn danger" type="button">确认删除</button><button class="wood-btn" type="button" data-close="delete-modal">取消</button></div></div>
   </div>
 
   <div id="all-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="all-heading">
     <div class="parchment-modal list-modal">
-      <button class="close-x" type="button" data-close="all-modal" aria-label="关闭">×</button>
-      <div class="modal-kicker">任务日志</div>
-      <h2 id="all-heading">全部待办</h2>
-      <div id="all-task-list" class="all-task-list"></div>
-      <div class="modal-actions"><button class="wood-btn" type="button" data-close="all-modal">返回</button></div>
+      <button class="close-x" type="button" data-close="all-modal" aria-label="关闭">×</button><div class="modal-kicker">任务日志</div><h2 id="all-heading">全部任务</h2>
+      <div id="all-filter" class="filter-strip" role="tablist" aria-label="筛选任务"><button type="button" class="filter-chip active" data-all-filter="active">待办</button><button type="button" class="filter-chip" data-all-filter="future">未来</button><button type="button" class="filter-chip" data-all-filter="completed">已完成</button></div>
+      <div id="all-task-list" class="all-task-list"></div><div class="modal-actions"><button class="wood-btn" type="button" data-close="all-modal">返回</button></div>
     </div>
   </div>
 
+  <div id="shared-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="shared-heading">
+    <div class="parchment-modal list-modal shared-modal-card">
+      <button class="close-x" type="button" data-close="shared-modal" aria-label="关闭">×</button><div class="modal-kicker">情侣空间</div><h2 id="shared-heading">我们的委托</h2>
+      <p id="shared-summary" class="gentle-note">连接情侣空间后，可以看见对方分享的委托并留下小纸条。</p>
+      <div id="shared-filter" class="filter-strip" role="tablist" aria-label="筛选共享任务"><button type="button" class="filter-chip active" data-shared-filter="active">当前</button><button type="button" class="filter-chip" data-shared-filter="future">未来</button><button type="button" class="filter-chip" data-shared-filter="completed">已完成</button></div>
+      <div id="shared-task-list" class="all-task-list"></div><div id="shared-empty" class="list-empty">还没有可以查看的共享委托。</div>
+      <div class="modal-actions"><button id="refresh-shared" class="wood-btn secondary" type="button">刷新委托</button><button id="open-share-settings" class="wood-btn" type="button">空间设置</button><button class="wood-btn" type="button" data-close="shared-modal">返回</button></div>
+    </div>
+  </div>
+
+  <div id="settings-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="settings-heading">
+    <div class="parchment-modal settings-modal-card">
+      <button class="close-x" type="button" data-close="settings-modal" aria-label="关闭">×</button><div class="modal-kicker">小镇手册</div><h2 id="settings-heading">设置</h2>
+      <details class="settings-section" data-settings-section="notifications" open><summary>🔔 通知</summary><div class="settings-body">
+        <div class="setting-line"><span>通知状态</span><strong id="notification-status">尚未开启</strong></div><button id="enable-notifications" class="wood-btn secondary" type="button">开启通知</button>
+        <label class="toggle-line"><input id="default-reminder-enabled" type="checkbox"> <span>默认提醒</span></label><label class="field compact"><span>默认提醒时间</span><input id="default-reminder-time" type="time" value="20:00"></label>
+        <button id="test-notification" class="wood-btn" type="button">测试通知</button><p class="field-help">iPhone 需先添加到主屏幕，并由你点击按钮后授权。</p>
+      </div></details>
+      <details class="settings-section" data-settings-section="sync"><summary>💌 我们的空间</summary><div class="settings-body">
+        <div class="setting-line"><span>当前状态</span><strong id="space-status">尚未连接</strong></div><div class="setting-line"><span>最后分享</span><strong id="last-share-sync">暂无</strong></div>
+        <label class="field compact"><span>我的称呼</span><input id="role-label-input" maxlength="16" placeholder="我 / 她 / 昵称"></label>
+        <div class="modal-actions start-actions"><button id="create-space" class="wood-btn primary" type="button">创建我们的空间</button><button id="copy-pair-link" class="wood-btn secondary" type="button" hidden>复制配对链接</button><button id="show-recovery-code" class="wood-btn" type="button" hidden>查看恢复码</button></div>
+        <label class="field"><span>新设备加入 / 恢复</span><textarea id="pair-token-input" rows="2" placeholder="粘贴配对链接或恢复码"></textarea></label>
+        <div class="modal-actions start-actions"><button id="join-space" class="wood-btn secondary" type="button">加入空间</button><button id="recover-space" class="wood-btn" type="button">恢复拥有者设备</button><button id="sync-shared-now" class="wood-btn" type="button">立即分享</button><button id="disconnect-device" class="wood-btn danger" type="button">断开本设备</button></div>
+        <div id="space-secret-output" class="secret-output" hidden></div><p class="field-help">共享镜像只用于对方查看、留言和提醒；本机 IndexedDB 仍是任务主数据。</p>
+      </div></details>
+      <details class="settings-section" data-settings-section="weather"><summary>🌦 天气</summary><div class="settings-body">
+        <label class="toggle-line"><input id="weather-enabled" type="checkbox"> <span>开启天气氛围</span></label><div class="modal-actions start-actions"><button id="weather-auto-location" class="wood-btn secondary" type="button">使用当前位置</button><button id="weather-refresh" class="wood-btn" type="button">刷新天气</button></div>
+        <div class="editor-row"><label class="field grow"><span>手动位置</span><input id="weather-city" maxlength="60" placeholder="城市，例如：杭州"></label><button id="weather-search" class="wood-btn compact-button" type="button">查找</button></div>
+        <div class="editor-row"><label class="field grow"><span>纬度</span><input id="weather-latitude" type="number" min="-90" max="90" step="0.0001"></label><label class="field grow"><span>经度</span><input id="weather-longitude" type="number" min="-180" max="180" step="0.0001"></label></div>
+        <div id="weather-status" class="gentle-note">天气关闭时保持默认晴天。</div>
+      </div></details>
+      <details class="settings-section" data-settings-section="display"><summary>🎨 显示</summary><div class="settings-body toggle-list">
+        <label class="toggle-line"><input id="time-mood-enabled" type="checkbox" checked> <span>时间氛围变化</span></label><label class="toggle-line"><input id="season-mood-enabled" type="checkbox" checked> <span>季节氛围变化</span></label><label class="toggle-line"><input id="weather-effects-enabled" type="checkbox" checked> <span>天气效果</span></label><label class="toggle-line"><input id="completion-animation-enabled" type="checkbox" checked> <span>完成动画</span></label><label class="toggle-line"><input id="plant-growth-enabled" type="checkbox" checked> <span>小植物成长</span></label>
+      </div></details>
+      <details class="settings-section" data-settings-section="sound"><summary>🎵 声音</summary><div class="settings-body">
+        <label class="toggle-line"><input id="bgm-enabled" type="checkbox"> <span>开启原创田园 BGM</span></label><label class="field compact"><span>音量</span><input id="bgm-volume" type="range" min="0" max="1" step="0.05" value="0.35"></label><p class="field-help">默认关闭，只有你主动开启后才会播放。</p>
+      </div></details>
+      <details class="settings-section" data-settings-section="data"><summary>📦 数据</summary><div class="settings-body">
+        <div class="modal-actions start-actions"><button id="export-data" class="wood-btn secondary" type="button">导出 JSON</button><label class="wood-btn file-button">导入 JSON<input id="import-data-file" type="file" accept="application/json,.json"></label><button id="create-backup" class="wood-btn" type="button">创建本地备份</button></div>
+        <label class="field compact"><span>本地备份</span><select id="backup-select"><option value="">暂无备份</option></select></label><div class="modal-actions start-actions"><button id="restore-backup" class="wood-btn" type="button">恢复所选备份</button><button id="clear-device-data" class="wood-btn danger" type="button">清除本设备数据</button></div><p class="field-help">清除本设备不会删除情侣空间或对方看到的历史镜像。</p>
+      </div></details>
+      <details class="settings-section" data-settings-section="about"><summary>📜 关于</summary><div class="settings-body"><div class="setting-line"><span>版本</span><strong id="app-version">V1.0.0</strong></div><button id="check-update" class="wood-btn" type="button">检查更新</button><p>任务主要保存在本设备；情侣空间仅保存共享镜像、留言和提醒所需数据。</p><p>天气位置、显示偏好、BGM 与本地备份不会上传。</p></div></details>
+      <div class="modal-actions"><button class="wood-btn" type="button" data-close="settings-modal">返回公告板</button></div>
+    </div>
+  </div>
+
+  <div id="import-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="import-heading"><div class="parchment-modal small-modal"><h2 id="import-heading">确认导入数据</h2><div id="import-summary" class="modal-desc"></div><div id="import-error" class="form-error" role="alert"></div><div class="modal-actions"><button id="import-merge" class="wood-btn primary" type="button">合并</button><button id="import-replace" class="wood-btn danger" type="button">替换本设备</button><button class="wood-btn" type="button" data-close="import-modal">取消</button></div></div></div>
+  <div id="confirm-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirm-heading"><div class="parchment-modal small-modal"><h2 id="confirm-heading">请确认</h2><p id="confirm-message"></p><div class="modal-actions"><button id="confirm-action" class="wood-btn danger" type="button">确认</button><button class="wood-btn" type="button" data-close="confirm-modal">取消</button></div></div></div>
+  <aside id="update-banner" class="update-banner" hidden aria-live="polite"><span>发现新版本</span><button id="apply-update" class="wood-btn primary" type="button">立即更新</button><button id="dismiss-update" class="wood-btn" type="button">稍后</button></aside>
   <div id="toast" role="status" aria-live="polite"></div>
   <script type="module" src="app.js"></script>
 </body>

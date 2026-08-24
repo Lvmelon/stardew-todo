@@ -1,0 +1,27 @@
+{
+  "name": "stardew-todo-pwa",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "今日任务 · 像素田园待办 V1.0",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "vitest run --config vitest.config.js",
+    "test:node": "node --test tests/experience/experience.test.mjs tests/share/share-modules.test.mjs",
+    "test:watch": "vitest --config vitest.config.js",
+    "test:worker": "npm --prefix worker test",
+    "check:syntax": "node scripts/check-syntax.mjs",
+    "check:config": "node scripts/check-config.mjs",
+    "verify": "npm run lint && npm run check:syntax && npm run check:config && npm test && npm run test:node && npm run test:worker"
+  },
+  "devDependencies": {
+    "eslint": "10.9.0",
+    "fake-indexeddb": "6.2.5",
+    "jsdom": "29.1.1",
+    "vitest": "4.1.11",
+    "yaml": "2.9.0"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

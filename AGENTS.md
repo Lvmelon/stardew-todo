@@ -13,12 +13,12 @@
 
 ## 2. 技术与部署边界
 
-- 保持纯静态 PWA 架构：HTML、CSS、Vanilla JavaScript、IndexedDB、Service Worker。
-- 不得无理由引入 React、Vue 或其他大型框架、构建系统和重型依赖。
-- 当前没有后端。任务数据优先保存在 IndexedDB，失败时降级到 localStorage，再失败时使用内存存储。
-- Service Worker 提供离线缓存；`manifest.webmanifest` 和 Apple 主屏幕元数据提供 PWA 安装能力。
+- 前端继续保持静态 PWA：HTML、CSS、Vanilla JavaScript、IndexedDB、Service Worker、Web App Manifest；不得无理由引入 React、Vue 或大型构建系统。
+- V1.0 可以增加独立的 Cloudflare Worker + D1 后端，但它只提供共享任务镜像、留言、配对、设备 Push 订阅、健康检查和 Cron 提醒 API。GitHub Pages 仍只发布静态前端。
+- 任务主数据优先保存在使用者本机 IndexedDB，失败时降级到 localStorage，再失败时使用内存。D1 不是本地任务的完整云端主库。
+- Service Worker 提供离线应用壳和 Web Push 事件处理；`manifest.webmanifest` 与 Apple 主屏幕元数据提供 PWA 安装能力。
 - `main` 是 GitHub Pages 发布分支，站点按项目子路径 `/stardew-todo/` 部署。新增或修改资源路径时必须继续兼容该子路径。
-- 不得把本地持久化描述成云备份或跨设备同步。清除站点数据、卸载并清理网站数据或更换设备时，数据可能无法恢复。
+- 不得把本地持久化或 D1 共享镜像描述成完整多设备同步、云备份或无条件恢复。清除站点数据、卸载并清理网站数据或更换设备时，本地主数据可能无法恢复；完整迁移使用 JSON 导出/导入。
 
 ## 3. 视觉基准与版权边界
 
@@ -54,7 +54,7 @@
 
 判断新功能时，优先问它是否降低操作负担、增强完成意愿并保持治愈感。不要因为技术上可行就扩大产品范围。
 
-## 5. 当前能力基线
+## 5. 当前能力基线与 V1.0 目标
 
 当前已有能力：
 
@@ -69,15 +69,9 @@
 - iPhone 添加到主屏幕；
 - GitHub Pages 发布。
 
-不要把尚未实现的能力写成现有功能。当前高优先级方向依次为：
+不要把尚未由代码、测试和线上响应分别证实的能力写成现有功能。V1.0 目标包括：真实的今日/逾期语义、Web Push、设置页、共享任务镜像、任务留言、情侣空间、JSON 导入导出、本地备份恢复、PWA 更新提示、天气、时间/季节/天气氛围、原创 procedural BGM、轻量植物成长、正式测试、CI 与 Worker 自动部署。
 
-1. 提醒 / 通知；
-2. 设置页；
-3. 更完整的截止日期逻辑；
-4. PWA 自动版本更新提示；
-5. 数据备份 / 同步。
-
-暂不优先：复杂游戏化、连续签到、积分奖励商城、农场经营系统。
+V1.0 明确不做：完整 Todo 云同步、双向多设备编辑、outbox 分布式队列、LWW 冲突解决、伙伴修改对方任务、全量设置云同步、传统账号体系、聊天 App、连续签到、积分奖励商城和农场经营系统。
 
 ## 6. 现有文件职责
 
@@ -91,6 +85,8 @@
 - `assets/scene.webp`：已确认的核心场景图，不得随意替换或重绘。
 - `assets/parchment-tile.png`：羊皮纸纹理。
 - `icons/`：PWA 与 Apple 主屏幕图标。
+- `worker/`：Cloudflare Worker 路由、D1 migrations、Cron 和 Web Push；它不能取代本地任务主数据。
+- `PRD.md`、`ARCHITECTURE.md`、`SECURITY.md`、`DEPLOYMENT.md`、`CREDITS.md`：V1.0 产品、架构、安全、部署和素材边界；描述必须与代码和验收状态一致。
 - `README.md`、`GITHUB-PAGES-DEPLOY.md`：能力说明与部署说明；修改功能或发布流程时同步检查文档是否仍然准确。
 
 ## 7. 事实与证据规范
@@ -127,8 +123,12 @@
   5. 浏览器中的实际功能验证。
 - 涉及存储时，验证 IndexedDB 正常路径、localStorage 降级路径以及刷新后的数据结果。
 - 涉及 Service Worker 时，验证首次加载、离线应用壳、旧缓存升级和 GitHub Pages 子路径，不得只修改缓存名后宣称更新完成。
+- 每次发布任何前端静态资源时都必须修改 `sw.js` 并递增缓存版本；否则已安装 PWA 可能先读取旧缓存，且不会进入可提示的新 Service Worker 生命周期。
 - 涉及 PWA 更新时，区分“新 Service Worker 已安装”“当前页面已由新版本控制”和“用户已经看到更新提示”。
 - 涉及提醒 / 通知时，验证权限拒绝、权限撤销、平台限制、应用在前台/后台/关闭时的差异；不得把浏览器通知能力误写成可靠的服务器定时推送。
+- 涉及共享镜像时，验证本地先写、Worker 失败不阻塞本地 Todo、`pendingShareSync` 在打开/联网/手动刷新时的轻量重试、伙伴只读权限、留言 append-only、删除 tombstone 和 D1 索引查询；不要引入或声称 outbox/LWW/双向同步。
+- 涉及配对与安全时，验证 URL fragment 读取后清理、secret/recovery code 不进入 query/日志/分析、服务器只保存 hash、Bearer 只走 HTTPS、owner/partner 权限和撤销流程。
+- 涉及 Cloudflare 时，分别验证 Worker 健康检查、D1 migration、CORS、Cron、VAPID secret 和 GitHub Actions；没有线上响应或控制台证据时，不得声称后端已部署。
 - 涉及视觉时，在桌面和窄屏/手机尺寸渲染检查主场景、覆盖层对齐、弹窗、文字溢出、安全区和可点击区域。
 - 验证以实际输出、DOM、存储结果、网络响应或渲染截图为证据，不能只依据命令退出码。
 
@@ -140,7 +140,7 @@
 - 不得因为“修改完成”就自动发布。
 - 只有项目所有者明确要求“发布”或“推送”后，才可执行 `git push origin main`。
 - push 后应核验 GitHub Pages 已更新到目标提交，并区分“push 成功”“Pages 构建完成”“线上资源已更新”三个状态。
-- 未经明确要求，不修改远端设置、Pages 配置、仓库可见性或历史提交。
+- Cloudflare Worker 的部署必须由明确的 CI/手动发布流程完成，并分别核验 Worker、D1、Cron 和 Pages；未经明确要求，不修改远端设置、Pages 配置、仓库可见性或历史提交。
 
 ## 11. 默认决策顺序
 

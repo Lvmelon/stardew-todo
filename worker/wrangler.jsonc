@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "stardew-todo-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2025-01-01",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "vars": {
+    "APP_VERSION": "1.0.0",
+    "ALLOWED_ORIGINS": "https://lvmelon.github.io,http://localhost:4173,http://localhost:8787,http://127.0.0.1:4173,http://127.0.0.1:8787"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "stardew-todo",
+      "database_id": "00000000000000000000000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": ["* * * * *"]
+  }
+}

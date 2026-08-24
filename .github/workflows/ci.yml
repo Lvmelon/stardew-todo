@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify static PWA and Worker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            worker/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install Worker dependencies
+        run: npm ci
+        working-directory: worker
+
+      - name: Lint root application
+        run: npm run lint
+
+      - name: Check JavaScript syntax
+        run: npm run check:syntax
+
+      - name: Validate manifests and workflows
+        run: npm run check:config
+
+      - name: Run root tests
+        run: npm test
+
+      - name: Run Node integration tests
+        run: npm run test:node
+
+      - name: Run Worker tests
+        run: npm test
+        working-directory: worker
+
+      - name: Validate Worker bundle with Wrangler
+        run: npm run deploy:dry-run
+        working-directory: worker

@@ -1,0 +1,12 @@
+node_modules/
+coverage/
+.env
+.env.*
+!.env.example
+.dev.vars
+.wrangler/
+worker/node_modules/
+worker/coverage/
+worker/.wrangler/
+dist/
+*.log

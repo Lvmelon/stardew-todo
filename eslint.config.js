@@ -1,0 +1,71 @@
+const browserGlobals = {
+  AbortController: 'readonly',
+  Blob: 'readonly',
+  CSS: 'readonly',
+  CustomEvent: 'readonly',
+  Date: 'readonly',
+  Document: 'readonly',
+  Element: 'readonly',
+  Event: 'readonly',
+  File: 'readonly',
+  FileReader: 'readonly',
+  FormData: 'readonly',
+  Headers: 'readonly',
+  IDBKeyRange: 'readonly',
+  Intl: 'readonly',
+  Notification: 'readonly',
+  Request: 'readonly',
+  Response: 'readonly',
+  TextDecoder: 'readonly',
+  TextEncoder: 'readonly',
+  URL: 'readonly',
+  URLSearchParams: 'readonly',
+  crypto: 'readonly',
+  caches: 'readonly',
+  document: 'readonly',
+  fetch: 'readonly',
+  geolocation: 'readonly',
+  globalThis: 'readonly',
+  history: 'readonly',
+  indexedDB: 'readonly',
+  localStorage: 'readonly',
+  location: 'readonly',
+  navigator: 'readonly',
+  self: 'readonly',
+  sessionStorage: 'readonly',
+  setTimeout: 'readonly',
+  clearTimeout: 'readonly',
+  window: 'readonly',
+};
+
+const testGlobals = {
+  afterEach: 'readonly',
+  beforeEach: 'readonly',
+  describe: 'readonly',
+  expect: 'readonly',
+  it: 'readonly',
+  vi: 'readonly',
+};
+
+export default [
+  {
+    ignores: ['node_modules/**', 'worker/**', 'coverage/**'],
+  },
+  {
+    files: ['**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { ...browserGlobals, ...testGlobals },
+    },
+    rules: {
+      'eqeqeq': ['error', 'always'],
+      'no-debugger': 'error',
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-var': 'error',
+      'prefer-const': 'error'
+    },
+  },
+];
