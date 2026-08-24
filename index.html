@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#68b85b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="今日任务">
+  <meta name="description" content="治愈的像素田园待办清单">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>今日任务 · 像素田园待办</title>
+</head>
+<body>
+  <div id="backdrop" aria-hidden="true"></div>
+  <main id="app-shell">
+    <section id="scene-card" aria-label="像素田园今日任务">
+      <img id="scene-art" src="assets/scene.webp" alt="像素田园村庄与木质任务公告板">
+
+      <div id="date-cover" aria-label="今天日期">
+        <span id="current-date"></span><span id="current-weekday"></span>
+      </div>
+      <div id="greeting-cover"><span id="greeting-text">早安，开始今天的任务吧！</span><span aria-hidden="true">♥</span></div>
+
+      <section id="task-patch" aria-label="今日任务列表">
+        <div id="task-list"></div>
+        <button id="overflow-count" class="overflow-link" type="button" hidden></button>
+        <div id="empty-state" hidden>今天暂时没有委托哦 🌱</div>
+      </section>
+
+      <button id="new-task-button" class="wood-sign" type="button" aria-label="新建任务">＋ 新任务</button>
+    </section>
+  </main>
+
+  <div id="detail-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <div class="parchment-modal">
+      <button class="close-x" type="button" data-close="detail-modal" aria-label="关闭">×</button>
+      <div class="modal-kicker">今日委托</div>
+      <h2 id="detail-title"></h2>
+      <div id="detail-desc" class="modal-desc"></div>
+      <div id="detail-date" class="detail-date" hidden></div>
+      <div class="modal-actions">
+        <button id="complete-task" class="wood-btn primary" type="button">完成任务</button>
+        <button id="edit-task" class="wood-btn secondary" type="button">编辑</button>
+        <button id="delete-task" class="wood-btn danger" type="button">删除</button>
+        <button class="wood-btn" type="button" data-close="detail-modal">返回</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editor-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="editor-heading">
+    <form id="task-form" class="parchment-modal">
+      <button class="close-x" type="button" data-close="editor-modal" aria-label="关闭">×</button>
+      <div class="modal-kicker">公告板</div>
+      <h2 id="editor-heading">新任务</h2>
+      <div class="editor-row">
+        <label class="field emoji-field"><span>图标</span><input id="task-emoji-input" maxlength="2" value="📌"></label>
+        <label class="field grow"><span>任务名称</span><input id="task-title-input" maxlength="40" required autocomplete="off"></label>
+      </div>
+      <label class="field"><span>任务描述</span><textarea id="task-desc-input" maxlength="120" rows="3" placeholder="可以留一句提醒……"></textarea></label>
+      <label class="field"><span>截止日期（可选）</span><input id="task-date-input" type="date"></label>
+      <div id="form-error" class="form-error" role="alert"></div>
+      <div class="modal-actions">
+        <button id="save-task" class="wood-btn primary" type="submit">贴到公告板</button>
+        <button class="wood-btn" type="button" data-close="editor-modal">取消</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="delete-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="delete-heading">
+    <div class="parchment-modal small-modal">
+      <h2 id="delete-heading">要移除这条任务吗？</h2>
+      <p>删除后它不会再出现在今日公告板上。</p>
+      <div class="modal-actions">
+        <button id="confirm-delete" class="wood-btn danger" type="button">确认删除</button>
+        <button class="wood-btn" type="button" data-close="delete-modal">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="all-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="all-heading">
+    <div class="parchment-modal list-modal">
+      <button class="close-x" type="button" data-close="all-modal" aria-label="关闭">×</button>
+      <div class="modal-kicker">任务日志</div>
+      <h2 id="all-heading">全部待办</h2>
+      <div id="all-task-list" class="all-task-list"></div>
+      <div class="modal-actions"><button class="wood-btn" type="button" data-close="all-modal">返回</button></div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
