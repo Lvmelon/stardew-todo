@@ -21,6 +21,7 @@ describe('V1.0 application shell', () => {
     const styles = await readFile(`${process.cwd()}/styles.css`, 'utf8');
     const appSource = await readFile(`${process.cwd()}/app.js`, 'utf8');
     expect(document.querySelectorAll('#greeting-cover [aria-hidden="true"]').length).toBe(0);
+    expect(styles).toMatch(/#greeting-cover\{[^}]*width:50\.5%/);
     expect(document.querySelector('#ambient-life-layer')).not.toBeNull();
     expect(document.querySelector('.couple-heart')).not.toBeNull();
     expect(document.querySelectorAll('.pixel-butterfly').length).toBeGreaterThanOrEqual(2);
