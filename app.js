@@ -962,6 +962,7 @@ export function createApplication(options = {}) {
       'time-mood-enabled': settings.timeAtmosphere,
       'season-mood-enabled': settings.seasonalAtmosphere,
       'weather-effects-enabled': settings.weatherEffects,
+      'ambient-motion-enabled': settings.ambientMotion,
       'completion-animation-enabled': settings.completionAnimation,
       'plant-growth-enabled': settings.plantGrowth,
       'bgm-enabled': settings.bgmEnabled,
@@ -997,6 +998,7 @@ export function createApplication(options = {}) {
       timeKey: settings.timeAtmosphere ? atmosphere.timeKey : 'day',
       seasonKey: settings.seasonalAtmosphere ? atmosphere.seasonKey : 'summer',
     });
+    body.classList.toggle('ambient-motion-off', settings.ambientMotion !== true);
     const plant = $('plant-progress');
     if (plant) {
       if (settings.plantGrowth) {
@@ -1382,6 +1384,7 @@ export function createApplication(options = {}) {
     on('time-mood-enabled', 'change', event => { void persistSetting({ timeAtmosphere: event.target.checked }); });
     on('season-mood-enabled', 'change', event => { void persistSetting({ seasonalAtmosphere: event.target.checked }); });
     on('weather-effects-enabled', 'change', event => { void persistSetting({ weatherEffects: event.target.checked }); });
+    on('ambient-motion-enabled', 'change', event => { void persistSetting({ ambientMotion: event.target.checked }); });
     on('completion-animation-enabled', 'change', event => { void persistSetting({ completionAnimation: event.target.checked }); });
     on('plant-growth-enabled', 'change', async event => {
       await persistSetting({ plantGrowth: event.target.checked });

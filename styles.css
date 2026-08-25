@@ -19,7 +19,7 @@ button{touch-action:manipulation}
 #scene-art{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill;user-select:none;pointer-events:none}
 #date-cover{position:absolute;left:33%;top:8.48%;width:38%;height:3.95%;display:flex;align-items:center;justify-content:center;gap:.45em;background:#f3d79b url("assets/parchment-tile.png") center/72px auto repeat;border-radius:9px;font-size:clamp(12px,3.35vw,17px);font-weight:800;letter-spacing:.03em;color:#593018;white-space:nowrap}
 #date-cover .dot{opacity:.65}
-#greeting-cover{position:absolute;left:22.6%;top:14.85%;width:54.9%;height:5.05%;display:flex;align-items:center;justify-content:center;gap:.5em;background:#f8dda1 url("assets/parchment-tile.png") center/76px auto repeat;border:2px solid #c58147;border-radius:8px;font-size:clamp(11px,3.05vw,16px);font-weight:750;color:#64361c;box-shadow:0 2px 0 rgba(92,47,21,.2)}
+#greeting-cover{position:absolute;left:22.6%;top:14.85%;width:53.3%;height:5.05%;display:flex;align-items:center;justify-content:center;padding:0 .45em;background:#f8dda1 url("assets/parchment-tile.png") center/76px auto repeat;border:2px solid #c58147;border-radius:8px;font-size:clamp(10px,2.7vw,14px);font-weight:750;line-height:1.25;text-align:center;color:#64361c;box-shadow:0 2px 0 rgba(92,47,21,.2)}
 #task-patch{position:absolute;left:29.2%;top:45%;width:46.1%;height:17.4%;padding:1.1% 2.1% .5%;background:#f3d28f url("assets/parchment-tile.png") center/66px auto repeat;clip-path:polygon(0 0,100% 0,100% 100%,14.5% 100%,14.5% 89%,0 89%);display:flex;flex-direction:column;justify-content:flex-start}
 #task-list{display:flex;flex-direction:column;min-height:0;flex:1}
 .task-row{min-height:20%;display:grid;grid-template-columns:1.1em 1.45em minmax(0,1fr) auto;align-items:center;gap:.12em;width:100%;padding:0 .1em;border:0;border-bottom:1px dashed rgba(120,69,31,.25);background:transparent;text-align:left;font-size:clamp(11px,2.95vw,15px);font-weight:760;color:#4f2b18;cursor:pointer}
@@ -60,6 +60,17 @@ button{touch-action:manipulation}
 /* V1.0 keeps the confirmed scene intact and adds only light overlays. */
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 #scene-art{transition:filter .45s ease}
+#ambient-life-layer{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none}
+.couple-heart{position:absolute;left:50.5%;top:71.8%;font-style:normal;font-size:clamp(12px,3.6vw,18px);line-height:1;color:#d85f67;text-shadow:1px 1px 0 #7a3428;opacity:0;animation:coupleHeartFloat 9s ease-in-out 1.8s infinite}
+.ambient-mote{position:absolute;width:3px;height:3px;background:#ffe38a;box-shadow:0 0 0 1px rgba(116,82,35,.18),0 0 5px rgba(255,226,126,.68);opacity:0;animation:ambientMoteDrift var(--mote-duration,8s) ease-in-out var(--mote-delay,0s) infinite}
+.mote-one{left:20%;top:78%;--mote-duration:8.5s;--mote-delay:.5s}.mote-two{left:69%;top:76%;--mote-duration:10s;--mote-delay:2.3s}.mote-three{left:81%;top:87%;--mote-duration:7.5s;--mote-delay:4.1s}.mote-four{left:31%;top:90%;--mote-duration:9.5s;--mote-delay:5.2s}
+.chimney-smoke{position:absolute;left:5.2%;top:27.6%;width:7px;height:7px;border-radius:40%;background:rgba(244,238,213,.58);box-shadow:4px -3px 0 rgba(239,232,208,.28);opacity:0;animation:chimneySmokeRise 6.6s ease-out infinite}
+.smoke-two{animation-delay:2.2s}.smoke-three{animation-delay:4.4s}
+body[data-time-mood="night"] .ambient-mote{background:#ffed91;box-shadow:0 0 6px 2px rgba(255,224,112,.72)}
+body.ambient-motion-off #ambient-life-layer{display:none}
+@keyframes coupleHeartFloat{0%,68%,100%{opacity:0;transform:translate(-50%,10px) scale(.65)}73%{opacity:.9}82%{opacity:1;transform:translate(-50%,-5px) scale(1)}92%{opacity:0;transform:translate(-50%,-21px) scale(.82)}}
+@keyframes ambientMoteDrift{0%,100%{opacity:0;transform:translate(0,6px)}25%{opacity:.35}55%{opacity:.72;transform:translate(8px,-8px)}80%{opacity:.18;transform:translate(-4px,-16px)}}
+@keyframes chimneySmokeRise{0%{opacity:0;transform:translate(0,8px) scale(.65)}18%{opacity:.5}70%{opacity:.18;transform:translate(10px,-28px) scale(1.35)}100%{opacity:0;transform:translate(15px,-43px) scale(1.65)}}
 #atmosphere-layer{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:4;overflow:hidden}
 #atmosphere-layer::before,.cloud-wash,.rain-field,.snow-field{grid-area:1/1;width:min(100vw,460px,calc((100vh - 28px) * .5628));aspect-ratio:941/1672;pointer-events:none}
 #atmosphere-layer::before{content:"";z-index:1;transition:background .45s ease}
@@ -77,6 +88,8 @@ body[data-season="spring"] #atmosphere-layer::before{background:rgba(245,190,210
 body[data-season="autumn"] #atmosphere-layer::before{background:rgba(190,109,35,.09)}
 body[data-season="winter"] #atmosphere-layer::before{background:rgba(188,218,230,.08)}
 @keyframes rainDrift{to{background-position:-34px 66px}}@keyframes snowFall{to{background-position:30px 94px,-22px 134px}}
+
+@media (prefers-reduced-motion:reduce){#ambient-life-layer{display:none!important}}
 
 .wood-sign{min-width:0;height:auto;min-height:4.6%;padding:0 .65em;z-index:6}
 .new-sign{right:4.2%;top:67.2%;min-width:24%;height:5.25%}

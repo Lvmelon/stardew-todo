@@ -20,8 +20,13 @@
   <main id="app-shell">
     <section id="scene-card" aria-label="像素田园今日任务">
       <img id="scene-art" src="assets/scene.webp" alt="像素田园村庄与木质任务公告板">
+      <div id="ambient-life-layer" aria-hidden="true">
+        <i class="chimney-smoke smoke-one"></i><i class="chimney-smoke smoke-two"></i><i class="chimney-smoke smoke-three"></i>
+        <i class="ambient-mote mote-one"></i><i class="ambient-mote mote-two"></i><i class="ambient-mote mote-three"></i><i class="ambient-mote mote-four"></i>
+        <i class="couple-heart">♥</i>
+      </div>
       <div id="date-cover" aria-label="今天日期"><span id="current-date"></span><span id="current-weekday"></span></div>
-      <div id="greeting-cover"><span id="greeting-text">早安，开始今天的任务吧！</span><span aria-hidden="true">♥</span></div>
+      <div id="greeting-cover"><span id="greeting-text">早安，开始今天的任务吧！</span></div>
       <section id="task-patch" aria-label="今日任务列表">
         <div id="task-list"></div>
         <button id="overflow-count" class="overflow-link" type="button" hidden></button>
@@ -140,7 +145,7 @@
         <div id="weather-status" class="gentle-note">天气关闭时保持默认晴天。</div>
       </div></details>
       <details class="settings-section" data-settings-section="display"><summary>🎨 显示</summary><div class="settings-body toggle-list">
-        <label class="toggle-line"><input id="time-mood-enabled" type="checkbox" checked> <span>时间氛围变化</span></label><label class="toggle-line"><input id="season-mood-enabled" type="checkbox" checked> <span>季节氛围变化</span></label><label class="toggle-line"><input id="weather-effects-enabled" type="checkbox" checked> <span>天气效果</span></label><label class="toggle-line"><input id="completion-animation-enabled" type="checkbox" checked> <span>完成动画</span></label><label class="toggle-line"><input id="plant-growth-enabled" type="checkbox" checked> <span>小植物成长</span></label>
+        <label class="toggle-line"><input id="time-mood-enabled" type="checkbox" checked> <span>时间氛围变化</span></label><label class="toggle-line"><input id="season-mood-enabled" type="checkbox" checked> <span>季节氛围变化</span></label><label class="toggle-line"><input id="weather-effects-enabled" type="checkbox" checked> <span>天气效果</span></label><label class="toggle-line"><input id="ambient-motion-enabled" type="checkbox" checked> <span>场景小动画</span></label><label class="toggle-line"><input id="completion-animation-enabled" type="checkbox" checked> <span>完成动画</span></label><label class="toggle-line"><input id="plant-growth-enabled" type="checkbox" checked> <span>小植物成长</span></label>
       </div></details>
       <details class="settings-section" data-settings-section="sound"><summary>🎵 声音</summary><div class="settings-body">
         <label class="toggle-line"><input id="bgm-enabled" type="checkbox"> <span>开启原创田园 BGM</span></label><label class="field compact"><span>音量</span><input id="bgm-volume" type="range" min="0" max="1" step="0.05" value="0.35"></label><p class="field-help">默认关闭，只有你主动开启后才会播放。</p>
@@ -149,7 +154,7 @@
         <div class="modal-actions start-actions"><button id="export-data" class="wood-btn secondary" type="button">导出 JSON</button><label class="wood-btn file-button">导入 JSON<input id="import-data-file" type="file" accept="application/json,.json"></label><button id="create-backup" class="wood-btn" type="button">创建本地备份</button></div>
         <label class="field compact"><span>本地备份</span><select id="backup-select"><option value="">暂无备份</option></select></label><div class="modal-actions start-actions"><button id="restore-backup" class="wood-btn" type="button">恢复所选备份</button><button id="clear-device-data" class="wood-btn danger" type="button">清除本设备数据</button></div><p class="field-help">清除本设备不会删除情侣空间或对方看到的历史镜像。</p>
       </div></details>
-      <details class="settings-section" data-settings-section="about"><summary>📜 关于</summary><div class="settings-body"><div class="setting-line"><span>版本</span><strong id="app-version">V1.0.1</strong></div><button id="check-update" class="wood-btn" type="button">检查更新</button><p>任务主要保存在本设备；情侣空间仅保存共享镜像、留言和提醒所需数据。</p><p>天气位置、显示偏好、BGM 与本地备份不会上传。</p></div></details>
+      <details class="settings-section" data-settings-section="about"><summary>📜 关于</summary><div class="settings-body"><div class="setting-line"><span>版本</span><strong id="app-version">V1.0.2</strong></div><button id="check-update" class="wood-btn" type="button">检查更新</button><p>任务主要保存在本设备；情侣空间仅保存共享镜像、留言和提醒所需数据。</p><p>天气位置、显示偏好、BGM 与本地备份不会上传。</p></div></details>
       <div class="modal-actions"><button class="wood-btn" type="button" data-close="settings-modal">返回公告板</button></div>
     </div>
   </div>

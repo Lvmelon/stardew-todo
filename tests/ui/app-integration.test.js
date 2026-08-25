@@ -171,6 +171,31 @@ describe('V1 application sharing consent', () => {
     expect(store.tasks[1]).toMatchObject({ title: '带伞', emoji: '☂️', startDate: '2026-08-25' });
   });
 
+  it('applies and persists the gentle scene motion preference', async () => {
+    const store = new AppStore();
+    store.settings = { ambientMotion: false };
+    const app = createApplication({
+      documentImpl: document,
+      navigatorImpl: {},
+      store,
+      shareClient: { async getCredentials() { return null; } },
+      shareSync: { bindLifecycle() {}, async retryPending() { return { tasks: [], comments: [] }; }, async getCachedSharedTasks() { return []; } },
+      notificationClient: { permission: () => 'default', support: () => ({ supported: false }) },
+      weatherService: { getCached: () => null },
+      audioManager: { setEnabled() {}, setVolume() {} },
+    });
+    await app.initialize();
+
+    expect(document.body.classList.contains('ambient-motion-off')).toBe(true);
+    const input = document.querySelector('#ambient-motion-enabled');
+    expect(input.checked).toBe(false);
+    input.checked = true;
+    input.dispatchEvent(new window.Event('change', { bubbles: true }));
+    await tick();
+    expect(store.settings.ambientMotion).toBe(true);
+    expect(document.body.classList.contains('ambient-motion-off')).toBe(false);
+  });
+
   it('opens the owned task when a notification click message reaches the page', async () => {
     const store = new AppStore([{
       id: 'task-from-push', title: '取快递', description: '下班路上', dueDate: '2026-08-25', status: 'open',

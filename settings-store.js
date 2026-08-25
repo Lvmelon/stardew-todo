@@ -8,6 +8,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   timeAtmosphere: true,
   seasonalAtmosphere: true,
   weatherEffects: true,
+  ambientMotion: true,
   completionAnimation: true,
   plantGrowth: true,
   bgmEnabled: false,
@@ -78,6 +79,7 @@ export function normalizeSettingValue(key, value) {
     case 'timeAtmosphere':
     case 'seasonalAtmosphere':
     case 'weatherEffects':
+    case 'ambientMotion':
     case 'completionAnimation':
     case 'plantGrowth':
     case 'bgmEnabled':

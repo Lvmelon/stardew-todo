@@ -16,6 +16,17 @@ describe('V1.0 application shell', () => {
     expect(document.querySelector('#plant-progress')).not.toBeNull();
   });
 
+  it('uses one greeting heart and provides gentle ambient scene layers', async () => {
+    const document = await loadDocument();
+    const styles = await readFile(`${process.cwd()}/styles.css`, 'utf8');
+    expect(document.querySelectorAll('#greeting-cover [aria-hidden="true"]').length).toBe(0);
+    expect(document.querySelector('#ambient-life-layer')).not.toBeNull();
+    expect(document.querySelector('.couple-heart')).not.toBeNull();
+    expect(document.querySelectorAll('.ambient-mote').length).toBeGreaterThanOrEqual(3);
+    expect(document.querySelector('#ambient-motion-enabled')).not.toBeNull();
+    expect(styles).toMatch(/@media\s*\(prefers-reduced-motion:reduce\)\s*\{#ambient-life-layer\{display:none!important\}\}/);
+  });
+
   it('contains reminder controls and the V1 settings sections', async () => {
     const document = await loadDocument();
     expect(document.querySelector('#task-start-date-input')).not.toBeNull();
@@ -37,6 +48,6 @@ describe('V1.0 application shell', () => {
     expect(document.querySelector('#shared-modal')).not.toBeNull();
     expect(document.querySelector('#comment-form')).not.toBeNull();
     expect(document.querySelector('#update-banner')).not.toBeNull();
-    expect(document.querySelector('#app-version')?.textContent).toContain('V1.0.1');
+    expect(document.querySelector('#app-version')?.textContent).toContain('V1.0.2');
   });
 });
