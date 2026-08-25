@@ -11,7 +11,7 @@ import {
 } from '../../data-transfer.js';
 
 const task = {
-  id: 'task-1', title: '取快递', description: '', emoji: '📦', dueDate: '', status: 'open',
+  id: 'task-1', title: '取快递', description: '', emoji: '📦', startDate: '2026-08-25', dueDate: '', status: 'open',
   createdAt: '2026-08-25T00:00:00.000Z', updatedAt: '2026-08-25T00:00:00.000Z',
 };
 

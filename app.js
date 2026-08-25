@@ -200,6 +200,7 @@ export function createApplication(options = {}) {
   const titleInput = $('task-title-input');
   const descInput = $('task-desc-input');
   const emojiInput = $('task-emoji-input');
+  const startDateInput = $('task-start-date-input');
   const dateInput = $('task-date-input');
   const reminderModeInput = $('task-reminder-mode');
   const reminderAtInput = $('task-reminder-at');
@@ -286,9 +287,12 @@ export function createApplication(options = {}) {
     status.textContent = task.status === 'completed' ? '已完成' : presentation.label;
     heading.append(emoji, title, status);
     button.appendChild(heading);
+    const dateParts = [];
+    if (task.startDate) dateParts.push(`开始：${formatDateOnly(task.startDate)}`);
+    if (task.dueDate) dateParts.push(`截止：${formatDateOnly(task.dueDate)}`);
     const meta = createTextElement('small', '', task.status === 'completed'
       ? `完成于 ${formatDateTime(task.completedAt || task.updatedAt)}`
-      : task.dueDate ? `截止：${formatDateOnly(task.dueDate)}` : '无截止日期 · 随时');
+      : dateParts.join(' · ') || '已开始 · 无截止日期');
     button.appendChild(meta);
     button.addEventListener('click', () => {
       setModal(source === 'shared' ? sharedModal : allModal, false);
@@ -315,7 +319,7 @@ export function createApplication(options = {}) {
       const emoji = createTextElement('span', 'task-emoji', task.emoji || '📌');
       const title = createTextElement('span', 'task-title', task.title || '未命名任务');
       const dueTag = createTextElement('small', 'task-due-tag', presentation.bucket === TASK_DATE_BUCKETS.OVERDUE
-        ? '逾期' : presentation.bucket === TASK_DATE_BUCKETS.TODAY ? '今日' : '随时');
+        ? '逾期' : presentation.bucket === TASK_DATE_BUCKETS.TODAY ? '今日' : presentation.bucket === TASK_DATE_BUCKETS.FUTURE ? presentation.label : '随时');
       row.append(mark, emoji, title, dueTag);
       row.addEventListener('click', () => openDetail(task.id, 'local'));
       taskList.appendChild(row);
@@ -441,9 +445,12 @@ export function createApplication(options = {}) {
     setStatus(detailDesc, task.description || '这条任务没有额外备注。');
     if (detailDate) {
       detailDate.hidden = false;
+      const formattedStartDate = task.startDate ? formatDateOnly(task.startDate) : '';
       const formattedDueDate = task.dueDate ? formatDateOnly(task.dueDate) : '';
       const gentleLabel = presentation.label && presentation.label !== formattedDueDate ? ` · ${presentation.label}` : '';
-      detailDate.textContent = task.dueDate ? `截止日期：${formattedDueDate}${gentleLabel}` : '无截止日期 · 随时';
+      const startLabel = formattedStartDate ? `开始日期：${formattedStartDate}` : '开始日期：立即';
+      const dueLabelText = task.dueDate ? `截止日期：${formattedDueDate}${gentleLabel}` : '无截止日期';
+      detailDate.textContent = `${startLabel} · ${dueLabelText}`;
       detailDate.className = `detail-date due-${presentation.tone}`;
     }
     if (detailReminder) {
@@ -478,14 +485,29 @@ export function createApplication(options = {}) {
     if (titleInput) titleInput.value = task?.title || '';
     if (descInput) descInput.value = task?.description || '';
     if (emojiInput) emojiInput.value = task?.emoji || '📌';
+    if (startDateInput) startDateInput.value = task ? (task.startDate || '') : toDateKey(new Date());
     if (dateInput) dateInput.value = task?.dueDate || '';
     if (reminderModeInput) reminderModeInput.value = task?.reminderMode || 'none';
     if (reminderAtInput) reminderAtInput.value = toLocalDateTimeInput(task?.reminderAt);
     if (formError) formError.textContent = '';
+    syncEmojiPresetSelection();
     toggleCustomReminderField();
     setModal(detailModal, false);
     setModal(editorModal, true);
     titleInput?.focus?.();
+  }
+
+  function syncEmojiPresetSelection() {
+    const value = String(emojiInput?.value || '').trim();
+    documentImpl.querySelectorAll('[data-task-emoji]').forEach(button => {
+      button.setAttribute('aria-pressed', button.dataset.taskEmoji === value ? 'true' : 'false');
+    });
+  }
+
+  function chooseTaskEmoji(event) {
+    if (!emojiInput) return;
+    emojiInput.value = event.currentTarget?.dataset?.taskEmoji || '📌';
+    syncEmojiPresetSelection();
   }
 
   function toggleCustomReminderField() {
@@ -507,6 +529,7 @@ export function createApplication(options = {}) {
       title: titleInput?.value || '',
       description: descInput?.value || '',
       emoji: emojiInput?.value || '',
+      startDate: startDateInput?.value || '',
       dueDate: dateInput?.value || '',
       reminderMode: reminderModeInput?.value || 'none',
     };
@@ -1277,6 +1300,8 @@ export function createApplication(options = {}) {
     on('settings-button', 'click', () => { updateSettingsUI(); void updateWeatherInputs(); setModal(settingsModal, true); });
     on('shared-button', 'click', () => { void openSharedModal(); });
     on('task-form', 'submit', event => { void saveTaskFromForm(event); });
+    documentImpl.querySelectorAll('[data-task-emoji]').forEach(button => button.addEventListener('click', chooseTaskEmoji));
+    emojiInput?.addEventListener('input', syncEmojiPresetSelection);
     on('task-reminder-mode', 'change', toggleCustomReminderField);
     on('complete-task', 'click', () => { void completeSelected(); });
     on('edit-task', 'click', () => selectedId && openEditor(selectedId));

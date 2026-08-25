@@ -18,6 +18,7 @@ describe('V1.0 application shell', () => {
 
   it('contains reminder controls and the V1 settings sections', async () => {
     const document = await loadDocument();
+    expect(document.querySelector('#task-start-date-input')).not.toBeNull();
     expect(document.querySelector('#task-reminder-mode')).not.toBeNull();
     expect(document.querySelector('#task-reminder-at')).not.toBeNull();
     for (const section of ['notifications', 'sync', 'weather', 'display', 'sound', 'data', 'about']) {
@@ -25,11 +26,17 @@ describe('V1.0 application shell', () => {
     }
   });
 
+  it('lets the task icon be chosen from presets or typed freely', async () => {
+    const document = await loadDocument();
+    expect(document.querySelector('#task-emoji-input')).not.toBeNull();
+    expect(document.querySelectorAll('[data-task-emoji]').length).toBeGreaterThanOrEqual(8);
+  });
+
   it('provides shared tasks, comments, and a controlled update prompt', async () => {
     const document = await loadDocument();
     expect(document.querySelector('#shared-modal')).not.toBeNull();
     expect(document.querySelector('#comment-form')).not.toBeNull();
     expect(document.querySelector('#update-banner')).not.toBeNull();
-    expect(document.querySelector('#app-version')?.textContent).toContain('V1.0.0');
+    expect(document.querySelector('#app-version')?.textContent).toContain('V1.0.1');
   });
 });

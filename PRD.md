@@ -88,18 +88,20 @@
 
 完成或删除先写本地，再尝试更新共享镜像。首页只显示 `open` 任务；任务详情和全部任务可以查看已完成记录及其留言，删除记录默认不出现在普通列表。
 
-### 5.2 截止日期分类
+### 5.2 开始日期与截止日期
 
-对 `open` 任务，以使用者当前设备的本地日历日期比较 `dueDate`（`YYYY-MM-DD`）：
+开始日期决定任务何时进入公告板，截止日期只表达到期和逾期状态。两者都按使用者当前设备的本地日历日期比较（`YYYY-MM-DD`）。
 
 | 条件 | 分类 | 首页 |
 | --- | --- | --- |
-| `dueDate < 今天` | 逾期 | 显示 |
-| `dueDate == 今天` | 今日到期 | 显示 |
-| `dueDate > 今天` | 未来 | 首页不显示，全部任务可见 |
-| 空值/null | 随时 | 显示 |
+| `startDate > 今天` | 未来任务 | 首页不显示，未来列表可见 |
+| `startDate <= 今天` 或空值 | 已开始 | 显示 |
+| 已开始且 `dueDate < 今天` | 逾期 | 显示并轻量提示 |
+| 已开始且 `dueDate == 今天` | 今日到期 | 显示 |
+| 已开始且 `dueDate > 今天` | 未来截止 | 仍显示，展示截止日期 |
+| 已开始且 `dueDate` 为空 | 无截止日期 | 显示 |
 
-首页顺序：逾期（最早日期优先）→ 今日到期（创建时间稳定升序）→ 无日期（创建时间稳定升序）。未来任务在“全部任务/我们的委托”中按日期升序查看。完成任务自动从首页消失。
+首页顺序：逾期（最早日期优先）→ 今日到期（创建时间稳定升序）→ 其他已开始任务（创建时间稳定升序）。未来任务按开始日期升序在“全部任务/我们的委托”中查看。完成任务自动从首页消失。截止日期不得早于开始日期。
 
 轻量文案：
 
@@ -163,7 +165,7 @@ Worker 从设备 token 推导角色：新镜像的 `ownerRole` 由服务端写�
 
 D1 只保存实现共享、留言和提醒所需字段：
 
-`spaceId`、`taskId`、`title`、`description`、`emoji`、`dueDate`、`status`、`createdAt`、`updatedAt`、`ownerRole`、`reminderMode`、`reminderAt`、`overdueAt`、提醒 claim/sent 标记。
+`spaceId`、`taskId`、`title`、`description`、`emoji`、`startDate`、`dueDate`、`status`、`createdAt`、`updatedAt`、`ownerRole`、`reminderMode`、`reminderAt`、`overdueAt`、提醒 claim/sent 标记。
 
 不上传本地 UI 设置、天气开关、定位、BGM、音量、动画偏好或其他纯本地数据。Worker 可使用服务器时间记录镜像更新时间；本地 `updatedAt` 不能被当作跨设备冲突时钟。
 
@@ -294,6 +296,7 @@ V0.5 任务必须保留：`id`、`title`、`description`、`emoji`、旧 `dueDat
 
 新增字段使用安全默认值：
 
+- `startDate`：空值，表示任务已经开始并继续留在今日公告板；
 - `ownerRole`：当前设备角色或 `owner`；
 - `reminderMode`：`none`；
 - `reminderAt`、`reminderSentAt`、`overdueReminderSentAt`：`null`；

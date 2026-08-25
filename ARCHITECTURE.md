@@ -70,6 +70,7 @@ Web Push
   title,
   description,
   emoji,
+  startDate,           // '' 或 YYYY-MM-DD；控制何时进入公告板
   dueDate,             // '' 或 YYYY-MM-DD
   status,              // open | completed | deleted
   createdAt,
@@ -104,12 +105,11 @@ Worker 故障、断网、CORS 失败或 Push 服务错误不得回滚本地任�
 
 日期分类由前端本地日期计算：
 
-- `open + dueDate < today`：逾期；
-- `open + dueDate === today`：今日到期；
-- `open + dueDate > today`：未来；
-- `open + !dueDate`：随时。
+- `open + startDate > today`：尚未开始，只进入未来列表；
+- `open + (startDate <= today || !startDate)`：已经开始，进入首页；
+- 已开始任务再按 `dueDate` 区分逾期、今日到期、未来截止或无截止日期。
 
-首页顺序为逾期（日期升序）→ 今日到期（创建时间稳定升序）→ 无日期（创建时间稳定升序）；未来任务在全部任务/我们的委托中查看。D1 读取视图也应提供同样的轻量分类，显示端再次按本地时区确认。
+首页顺序为逾期（日期升序）→ 今日到期（创建时间稳定升序）→ 其他已开始任务（创建时间稳定升序）；未来任务按 `startDate` 在全部任务/我们的委托中查看。D1 共享镜像包含 `startDate`，显示端仍按本地时区确认；`dueDate` 继续只驱动到期提示和提醒。
 
 ## 5. 配对、设备和权限
 
@@ -181,6 +181,7 @@ tasks (
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   emoji TEXT NOT NULL,
+  start_date TEXT,
   due_date TEXT,
   status TEXT CHECK (status IN ('open', 'completed', 'deleted')) NOT NULL,
   created_at TEXT NOT NULL,
@@ -224,6 +225,7 @@ push_subscriptions (
 必要索引：
 
 - `tasks(space_id, status, updated_at)`：共享任务列表；
+- `tasks(space_id, status, start_date, created_at)`：按开始日期读取未来共享委托；
 - `idx_tasks_reminder_due(reminder_at, reminder_claimed_at, space_id, task_id)`：`open` 且普通提醒未发送的部分索引；
 - `idx_tasks_overdue_at(overdue_at, overdue_reminder_claimed_at, space_id, task_id)`：`open` 且逾期提醒未发送的部分索引；
 - `comments(space_id, task_id, created_at)`：留言时间顺序；

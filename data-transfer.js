@@ -8,13 +8,13 @@ export const MAX_IMPORT_BYTES = 1024 * 1024;
 
 const TOP_LEVEL_KEYS = new Set(['type', 'schemaVersion', 'appVersion', 'exportedAt', 'tasks', 'sharedTasks', 'comments', 'settings']);
 const TASK_KEYS = new Set([
-  'id', 'title', 'description', 'emoji', 'dueDate', 'status', 'createdAt', 'updatedAt',
+  'id', 'title', 'description', 'emoji', 'startDate', 'dueDate', 'status', 'createdAt', 'updatedAt',
   'completedAt', 'deletedAt', 'reminderMode', 'reminderAt', 'overdueAt', 'reminderSentAt',
   'overdueReminderSentAt', 'ownerRole', 'sourceRevision', 'pendingShareSync', 'lastSharedAt',
   'createdByDevice', 'createdByRole',
 ]);
 const SHARED_TASK_KEYS = new Set([
-  'taskId', 'spaceId', 'title', 'description', 'emoji', 'dueDate', 'status', 'createdAt', 'updatedAt',
+  'taskId', 'spaceId', 'title', 'description', 'emoji', 'startDate', 'dueDate', 'status', 'createdAt', 'updatedAt',
   'ownerRole', 'revision', 'reminderMode', 'reminderAt', 'overdueAt', 'reminderSentAt', 'overdueReminderSentAt', 'sourceRevision',
 ]);
 const COMMENT_KEYS = new Set(['commentId', 'taskId', 'spaceId', 'authorRole', 'authorLabel', 'content', 'createdAt']);

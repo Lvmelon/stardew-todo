@@ -13,10 +13,10 @@ const now = () => '2026-08-25T10:00:00.000Z';
 
 describe('task model V1 fields and soft state transitions', () => {
   it('creates a task with reminder/share fields and a pending mirror marker', () => {
-    const task = createTask({ title: '取快递', dueDate: '2026-08-25', reminderMode: 'custom', reminderAt: '2026-08-25T20:00:00+08:00' }, () => 'task-1', now);
+    const task = createTask({ title: '取快递', startDate: '2026-08-25', dueDate: '2026-08-27', reminderMode: 'custom', reminderAt: '2026-08-25T20:00:00+08:00' }, () => 'task-1', now);
     expect(task).toMatchObject({
       id: 'task-1', status: 'open', ownerRole: 'me', sourceRevision: 1, pendingShareSync: true,
-      reminderMode: 'custom', reminderSentAt: null, overdueReminderSentAt: null,
+      startDate: '2026-08-25', dueDate: '2026-08-27', reminderMode: 'custom', reminderSentAt: null, overdueReminderSentAt: null,
     });
   });
 
@@ -43,6 +43,10 @@ describe('task model V1 fields and soft state transitions', () => {
     expect(() => createTask({ title: '缺时间提醒', reminderMode: 'custom' }, () => 'task-1', now)).toThrow('自定义提醒需要');
   });
 
+  it('rejects an end date before the start date', () => {
+    expect(() => createTask({ title: '日期颠倒', startDate: '2026-08-26', dueDate: '2026-08-25' }, () => 'task-1', now)).toThrow('截止日期不能早于开始日期');
+  });
+
   it('keeps completed and deleted records as soft states', () => {
     const original = createTask({ title: '收衣服' }, () => 'task-1', now);
     const completed = completeTask(original, () => '2026-08-25T11:00:00.000Z');
@@ -55,7 +59,7 @@ describe('task model V1 fields and soft state transitions', () => {
 
   it('adds missing V1 defaults without removing legacy fields', () => {
     const legacy = normalizeTask({ id: 'legacy', title: '旧任务', customLegacyField: 'keep', status: 'open', dueDate: '' }, now);
-    expect(legacy).toMatchObject({ id: 'legacy', customLegacyField: 'keep', reminderMode: 'none', overdueAt: null, sourceRevision: 0, pendingShareSync: false });
+    expect(legacy).toMatchObject({ id: 'legacy', customLegacyField: 'keep', startDate: '', reminderMode: 'none', overdueAt: null, sourceRevision: 0, pendingShareSync: false });
   });
 
   it('clears pending mirror state only after explicit share success', () => {

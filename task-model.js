@@ -1,6 +1,7 @@
 import {
   classifyTask,
   formatDateOnly,
+  isValidDateOnly,
   sortTasksForDisplay,
   sortTasksForToday,
   TASK_DATE_BUCKETS,
@@ -20,8 +21,15 @@ export function validateTaskInput(input = {}) {
   if ([...title].length > MAX_TITLE_LENGTH) return { ok: false, message: '任务名称最多 40 个字' };
 
   const dueDate = String(input.dueDate ?? '').trim();
-  if (dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+  const startDate = String(input.startDate ?? '').trim();
+  if (startDate && !isValidDateOnly(startDate)) {
+    return { ok: false, message: '开始日期格式不正确' };
+  }
+  if (dueDate && !isValidDateOnly(dueDate)) {
     return { ok: false, message: '截止日期格式不正确' };
+  }
+  if (startDate && dueDate && dueDate < startDate) {
+    return { ok: false, message: '截止日期不能早于开始日期' };
   }
   const description = String(input.description ?? '').trim();
   if ([...description].length > MAX_DESCRIPTION_LENGTH) {
@@ -59,6 +67,7 @@ export function createTask(input = {}, idFactory = defaultId, nowFactory = defau
     title: String(input.title).trim(),
     description: String(input.description ?? '').trim(),
     emoji: String(input.emoji ?? '').trim() || '📌',
+    startDate: String(input.startDate ?? '').trim(),
     dueDate: String(input.dueDate ?? '').trim(),
     status: 'open',
     createdAt: now,
@@ -79,6 +88,7 @@ export function normalizeTask(input = {}, nowFactory = defaultNow) {
   const now = normalizeTimestamp(typeof nowFactory === 'function' ? nowFactory() : nowFactory) || defaultNow();
   const createdAt = normalizeTimestamp(source.createdAt) || now;
   const updatedAt = normalizeTimestamp(source.updatedAt) || createdAt;
+  const startDate = source.startDate === null || source.startDate === undefined ? '' : String(source.startDate).trim();
   const dueDate = source.dueDate === null || source.dueDate === undefined ? '' : String(source.dueDate).trim();
   const reminderAt = normalizeNullable(source.reminderAt);
   const reminderMode = normalizeReminderMode(source.reminderMode, reminderAt);
@@ -90,6 +100,7 @@ export function normalizeTask(input = {}, nowFactory = defaultNow) {
     title: String(source.title ?? '').trim(),
     description: String(source.description ?? '').trim(),
     emoji: String(source.emoji ?? '').trim() || '📌',
+    startDate,
     dueDate,
     status,
     createdAt,
@@ -125,6 +136,7 @@ export function updateTask(task, input = {}, nowFactory = defaultNow) {
     title: String(input.title).trim(),
     description: String(input.description ?? '').trim(),
     emoji: String(input.emoji ?? '').trim() || '📌',
+    startDate: String(input.startDate ?? '').trim(),
     dueDate: String(input.dueDate ?? '').trim(),
     updatedAt: now,
     reminderMode: nextReminderMode,
@@ -226,6 +238,7 @@ export function toSharedTask(task, spaceId) {
     title: normalized.title,
     description: normalized.description,
     emoji: normalized.emoji,
+    startDate: normalized.startDate || null,
     dueDate: normalized.dueDate || null,
     status: normalized.status,
     createdAt: normalized.createdAt,

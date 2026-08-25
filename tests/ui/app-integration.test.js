@@ -105,7 +105,7 @@ describe('V1 application sharing consent', () => {
   it('keeps a route to future and completed tasks when the home board has no current task', async () => {
     const store = new AppStore([
       {
-        id: 'future-1', title: '未来任务', dueDate: '2026-08-27', status: 'open',
+        id: 'future-1', title: '未来任务', startDate: '2099-08-27', dueDate: '2099-08-30', status: 'open',
         createdAt: '2026-08-25T00:00:00.000Z', updatedAt: '2026-08-25T00:00:00.000Z',
       },
       {
@@ -137,6 +137,38 @@ describe('V1 application sharing consent', () => {
     expect(empty.textContent).toContain('未来');
     expect(route.hidden).toBe(false);
     expect(route.dataset.filter).toBe('future');
+  });
+
+  it('saves a selected preset or a custom task icon together with the start date', async () => {
+    const store = new AppStore();
+    const app = createApplication({
+      documentImpl: document,
+      navigatorImpl: {},
+      store,
+      shareClient: { async getCredentials() { return null; } },
+      shareSync: { bindLifecycle() {}, async retryPending() { return { tasks: [], comments: [] }; }, async syncTask(task) { return { task }; } },
+      notificationClient: { permission: () => 'default', support: () => ({ supported: false }) },
+      weatherService: { getCached: () => null },
+      audioManager: { setEnabled() {}, setVolume() {} },
+    });
+    await app.initialize();
+
+    document.querySelector('#new-task-button').click();
+    [...document.querySelectorAll('[data-task-emoji]')].find(button => button.textContent === '📦').click();
+    document.querySelector('#task-title-input').value = '取快递';
+    document.querySelector('#task-start-date-input').value = '2026-08-25';
+    document.querySelector('#task-date-input').value = '2026-08-27';
+    document.querySelector('#task-form').requestSubmit();
+    await tick();
+    expect(store.tasks[0]).toMatchObject({ title: '取快递', emoji: '📦', startDate: '2026-08-25', dueDate: '2026-08-27' });
+
+    document.querySelector('#new-task-button').click();
+    document.querySelector('#task-title-input').value = '带伞';
+    document.querySelector('#task-emoji-input').value = '☂️';
+    document.querySelector('#task-start-date-input').value = '2026-08-25';
+    document.querySelector('#task-form').requestSubmit();
+    await tick();
+    expect(store.tasks[1]).toMatchObject({ title: '带伞', emoji: '☂️', startDate: '2026-08-25' });
   });
 
   it('opens the owned task when a notification click message reaches the page', async () => {

@@ -16,7 +16,7 @@
 D1 只保存：
 
 - space/member 授权摘要和 hash；
-- 任务共享镜像必要字段：`taskId`、`spaceId`、标题、描述、emoji、截止日期、状态、创建/更新时间、ownerRole；
+- 任务共享镜像必要字段：`taskId`、`spaceId`、标题、描述、emoji、开始日期、截止日期、状态、创建/更新时间、ownerRole；
 - 提醒所需的 `reminderMode`、`reminderAt`、发送标记；
 - append-only 留言；
 - 两个角色各自设备的 Web Push subscription 必要字段；提醒只投递给与任务 `ownerRole` 相同的设备角色。

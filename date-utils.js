@@ -76,7 +76,13 @@ export function classifyDueDate(dueDate, referenceDate = new Date()) {
 }
 
 export function classifyTask(task, referenceDate = new Date()) {
-  return classifyDueDate(task?.dueDate, referenceDate);
+  const startKey = String(task?.startDate ?? '').trim();
+  const todayKey = toDateKey(referenceDate);
+  if (isValidDateOnly(startKey) && todayKey && startKey > todayKey) {
+    return TASK_DATE_BUCKETS.FUTURE;
+  }
+  const dueBucket = classifyDueDate(task?.dueDate, referenceDate);
+  return dueBucket === TASK_DATE_BUCKETS.FUTURE ? TASK_DATE_BUCKETS.ANYTIME : dueBucket;
 }
 
 function timestampForSort(value) {
@@ -110,6 +116,8 @@ export function sortTasksForToday(tasks = [], referenceDate = new Date()) {
       if (bucketResult !== 0) return bucketResult;
       const dateResult = left.bucket === TASK_DATE_BUCKETS.OVERDUE
         ? compareDateKeys(left.task.dueDate, right.task.dueDate)
+        : left.bucket === TASK_DATE_BUCKETS.FUTURE
+          ? compareDateKeys(left.task.startDate, right.task.startDate)
         : 0;
       if (dateResult !== 0) return dateResult;
       const creationResult = compareCreation(left.task, right.task);
@@ -128,6 +136,8 @@ export function sortTasksForDisplay(tasks = [], referenceDate = new Date()) {
       if (bucketResult !== 0) return bucketResult;
       const dateResult = left.bucket === TASK_DATE_BUCKETS.OVERDUE
         ? compareDateKeys(left.task.dueDate, right.task.dueDate)
+        : left.bucket === TASK_DATE_BUCKETS.FUTURE
+          ? compareDateKeys(left.task.startDate, right.task.startDate)
         : 0;
       if (dateResult !== 0) return dateResult;
       const creationResult = compareCreation(left.task, right.task);
@@ -146,7 +156,7 @@ export function formatDateOnly(value, options = {}) {
 }
 
 export function getDueDatePresentation(task, referenceDate = new Date()) {
-  const bucket = classifyTask(task, referenceDate);
+  const bucket = classifyDueDate(task?.dueDate, referenceDate);
   if (bucket === TASK_DATE_BUCKETS.ANYTIME) {
     return { bucket, label: '随时', tone: 'quiet', isOverdue: false };
   }

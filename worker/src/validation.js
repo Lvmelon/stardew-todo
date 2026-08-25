@@ -163,7 +163,11 @@ export function normalizeTaskInput(body, { partial = false } = {}) {
   if (!partial || body.title !== undefined) result.title = stringField(body.title, "title", { max: 40 });
   if (body.description !== undefined || !partial) result.description = stringField(body.description ?? "", "description", { max: 120, allowNewlines: true });
   if (body.emoji !== undefined || !partial) result.emoji = stringField(body.emoji ?? "🌱", "emoji", { max: 16 });
+  if (body.startDate !== undefined || !partial) result.startDate = calendarDate(body.startDate, "startDate");
   if (body.dueDate !== undefined || !partial) result.dueDate = calendarDate(body.dueDate, "dueDate");
+  if (result.startDate && result.dueDate && result.dueDate < result.startDate) {
+    fail(400, "invalid_input", "dueDate cannot be before startDate");
+  }
   if (!partial || body.status !== undefined) result.status = enumValue(body.status ?? "open", "status", ["open", "completed", "deleted"]);
   if (!partial || body.createdAt !== undefined) result.createdAt = isoDateTime(body.createdAt, "createdAt");
   if (!partial || body.updatedAt !== undefined) result.updatedAt = isoDateTime(body.updatedAt, "updatedAt");

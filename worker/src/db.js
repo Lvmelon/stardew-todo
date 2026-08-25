@@ -29,6 +29,7 @@ function taskFromRow(row) {
     title: row.title,
     description: row.description,
     emoji: row.emoji,
+    startDate: row.start_date,
     dueDate: row.due_date,
     status: row.status,
     createdAt: row.created_at,
@@ -231,13 +232,14 @@ export async function upsertTask(env, auth, body, taskId = undefined, now = new 
   const result = await db
     .prepare(
       `INSERT INTO tasks
-       (space_id, task_id, title, description, emoji, due_date, status,
+       (space_id, task_id, title, description, emoji, start_date, due_date, status,
         created_at, updated_at, owner_role, revision, reminder_mode, reminder_at, overdue_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(space_id, task_id) DO UPDATE SET
          title = excluded.title,
          description = excluded.description,
          emoji = excluded.emoji,
+         start_date = excluded.start_date,
          due_date = excluded.due_date,
          status = excluded.status,
          updated_at = excluded.updated_at,
@@ -254,6 +256,7 @@ export async function upsertTask(env, auth, body, taskId = undefined, now = new 
       task.title,
       task.description,
       task.emoji,
+      task.startDate,
       task.dueDate,
       task.status,
       task.createdAt,

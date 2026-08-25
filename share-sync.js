@@ -25,6 +25,7 @@ export function toSharedTask(task, credentials = {}) {
     title: String(task.title || '').trim(),
     description: String(task.description || '').trim(),
     emoji: String(task.emoji || '📌').trim() || '📌',
+    startDate: String(task.startDate || '').trim() || null,
     dueDate: String(task.dueDate || '').trim() || null,
     status: String(task.status || 'open'),
     createdAt: task.createdAt || null,

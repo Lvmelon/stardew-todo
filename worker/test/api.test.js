@@ -57,6 +57,7 @@ describe("shared mirror API", () => {
       title: "取快递",
       description: "下班路上带回来",
       emoji: "📦",
+      startDate: "2026-08-23",
       dueDate: "2026-08-24",
       status: "open",
       createdAt: "2026-08-25T09:00:00.000Z",
@@ -75,6 +76,7 @@ describe("shared mirror API", () => {
     expect(mirrored.response.status).toBe(200);
     expect(mirrored.data.accepted).toBe(true);
     expect(mirrored.data.task.title).toBe("取快递");
+    expect(mirrored.data.task.startDate).toBe("2026-08-23");
 
     const partnerTasks = await call(`/v1/spaces/${created.data.spaceId}/tasks`, { token: joined.data.accessToken });
     expect(partnerTasks.response.status).toBe(200);

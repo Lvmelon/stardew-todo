@@ -1,6 +1,6 @@
 {
   "name": "stardew-todo-worker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "description": "Shared task mirror, comments, and reminder Worker for 今日任务 · 像素田园待办",

@@ -2,7 +2,7 @@
 // A host page may provide a public runtime override before loading the modules:
 //   window.STARDEW_TODO_CONFIG = { apiBaseUrl, vapidPublicKey };
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.0.1';
 
 export const SHARE_META_KEY = 'shareCredentials';
 export const SHARED_TASKS_CACHE_KEY = 'sharedTasks';

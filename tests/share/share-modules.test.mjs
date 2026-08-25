@@ -65,7 +65,7 @@ async function testPairingAndAuth() {
 }
 
 async function testPendingTaskShareAndCommentRetry() {
-  const task = { id: 'task-1', title: '取快递', status: 'open', createdAt: '2026-08-25T00:00:00.000Z', updatedAt: '2026-08-25T00:00:00.000Z' };
+  const task = { id: 'task-1', title: '取快递', startDate: '2026-08-25', dueDate: '2026-08-27', status: 'open', createdAt: '2026-08-25T00:00:00.000Z', updatedAt: '2026-08-25T00:00:00.000Z' };
   const store = new FakeStore([task]);
   let taskAttempts = 0;
   let commentAttempts = 0;
@@ -77,6 +77,7 @@ async function testPendingTaskShareAndCommentRetry() {
   const sync = createShareSync({ store, shareClient });
   const partnerMirror = sync.toSharedTask(task, { spaceId: 'space-1', role: 'partner' });
   assert.equal(partnerMirror.ownerRole, 'partner');
+  assert.equal(partnerMirror.startDate, '2026-08-25');
   assert.equal(partnerMirror.reminderMode, 'none');
   const first = await sync.syncTask(task);
   assert.equal(first.pendingShareSync, true);

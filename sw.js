@@ -1,4 +1,4 @@
-const CACHE = 'stardew-todo-v1.0.0-2';
+const CACHE = 'stardew-todo-v1.0.1-1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -44,7 +44,7 @@ self.addEventListener('message', event => {
     self.skipWaiting();
   }
   if (message.type === 'GET_VERSION') {
-    event.source?.postMessage({ type: 'APP_VERSION', version: '1.0.0', cache: CACHE });
+    event.source?.postMessage({ type: 'APP_VERSION', version: '1.0.1', cache: CACHE });
   }
   if (message.type === 'TEST_NOTIFICATION') {
     event.waitUntil(self.registration.showNotification('今日任务', {
