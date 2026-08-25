@@ -28,12 +28,12 @@ import {
 import { createShareClient, readPairFragment, clearPairFragment } from './share-client.js';
 import { createShareSync } from './share-sync.js';
 import { createNotificationClient } from './notification-client.js';
-import { createUpdateManager } from './update-manager.js?v=1.0.3';
+import { createUpdateManager } from './update-manager.js?v=1.0.4';
 import { createWeatherService, applyWeatherClass } from './weather.js';
 import { applyAtmosphereClass, getAtmosphere } from './atmosphere.js';
 import { createAudioManager } from './audio-manager.js';
 import { applyPlantGrowth } from './plant-growth.js';
-import { APP_VERSION, CONFIG } from './config.js?v=1.0.3';
+import { APP_VERSION, CONFIG } from './config.js?v=1.0.4';
 
 const HOME_LIMIT = 5;
 const DEFAULT_TASK_TITLES = [
@@ -1020,7 +1020,7 @@ export function createApplication(options = {}) {
         ? '场景小动画已关闭。'
         : reducedMotion
           ? '系统已开启“减少动态效果”，场景动画已暂停。'
-          : '烟囱、蝴蝶和草地会轻轻动起来。');
+          : '烟雾、飞鸟、蝴蝶和飘叶会轻轻动起来。');
     }
     const plant = $('plant-progress');
     if (plant) {
