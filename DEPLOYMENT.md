@@ -176,7 +176,7 @@ Actions job 至少执行：
 仓库 `Settings` → `Secrets and variables` → `Actions` 中配置最小权限：
 
 - `CLOUDFLARE_API_TOKEN`：仅允许目标 Worker/D1 所需权限；
-- `CLOUDFLARE_ACCOUNT_ID`：账户标识；
+- `CLOUDFLARE_ACCOUNT_ID` 是公开路由标识，已在 workflow 中固定为已核实的账户 ID，不作为 Secret 注入；
 - 若工作流需要迁移或 VAPID 操作，使用专门的 secret，不把值写入 YAML。
 
 官方 CI 参考：[Cloudflare Workers GitHub Actions](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)、[GitHub Actions secrets](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)。
