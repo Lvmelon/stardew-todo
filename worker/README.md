@@ -7,9 +7,9 @@ comment, and deliver an owner reminder.
 
 ## Deploying
 
-1. Create a D1 database and replace the all-zero `database_id` in
-   `wrangler.jsonc`. The all-zero ID is a safe configuration placeholder only;
-   it is not a usable production database ID.
+1. The checked-in `DB` binding points at the production `stardew-todo` D1
+   database. Forks must create their own database and replace `database_id` in
+   `wrangler.jsonc`; do not reuse another account's binding ID.
 2. Apply migrations with `npx wrangler d1 migrations apply stardew-todo`.
 3. Store the Web Push VAPID values as secrets:
 

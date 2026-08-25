@@ -1,4 +1,4 @@
-const CACHE = 'stardew-todo-v1.0.0';
+const CACHE = 'stardew-todo-v1.0.0-2';
 const APP_SHELL = [
   './',
   './index.html',

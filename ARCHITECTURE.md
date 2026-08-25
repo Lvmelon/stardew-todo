@@ -13,7 +13,7 @@ V1.0 是“本地任务主数据 + 云端共享任务镜像”：
 
 这不是完整多设备同步系统：没有双向任务拉取、outbox 分布式队列、LWW 冲突合并、伙伴编辑对方任务或全量设置云同步。
 
-> 文档描述的是 V1.0 目标架构。Cloudflare 登录、D1、Secrets、Cron、Web Push 和 iPhone 真机行为必须由发布验收单独证明；本文件不声称它们已经部署或真机验证。
+> 截至 2026-08-25，Worker、D1 migration、VAPID Secrets 和 Cron trigger 已部署，线上 API/权限/CORS 已验证；外部 Push 服务接受及 iPhone/PC 最终展示仍需真实设备验收。架构描述不能替代对应运行证据。
 
 ## 2. 用户指定的数据流
 

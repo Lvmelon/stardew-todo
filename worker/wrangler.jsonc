@@ -16,7 +16,7 @@
     {
       "binding": "DB",
       "database_name": "stardew-todo",
-      "database_id": "00000000000000000000000000000000",
+      "database_id": "6d435f2b-372b-4a7f-893b-4cbc51e18a0a",
       "migrations_dir": "migrations"
     }
   ],

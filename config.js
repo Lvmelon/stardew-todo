@@ -28,10 +28,9 @@ export const API_PATHS = Object.freeze({
 });
 
 const DEFAULT_CONFIG = Object.freeze({
-  // Empty is intentional: the app stays usable offline and the parent app can
-  // inject the deployed Worker URL at runtime.  A relative URL also works for
-  // local development when a reverse proxy is present.
-  apiBaseUrl: '',
+  // Public Worker origin only; authentication stays in per-device local
+  // credentials and VAPID private material remains a Worker secret.
+  apiBaseUrl: 'https://stardew-todo-worker.stardew-todo.workers.dev',
   vapidPublicKey: '',
 });
 

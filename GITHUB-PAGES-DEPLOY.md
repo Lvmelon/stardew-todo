@@ -44,7 +44,7 @@ Web Push 在 iPhone/iPad 上需要用户把网站添加到主屏幕，并依赖 
 
 ## Cloudflare Worker 的独立发布
 
-GitHub Pages 只发布前端静态文件，不会发布 `worker/` 中的 Worker，也不会创建 D1、Secrets 或 Cron。仓库当前有 `.github/workflows/deploy-worker.yml` 作为 Worker 自动部署目标，但是否成功运行仍要看 Actions run、Worker deployment、D1 migration 和 health 响应。Worker 部署、D1 迁移、VAPID Secrets 和 CI 说明见 [`DEPLOYMENT.md`](./DEPLOYMENT.md)。不能把“Pages 已发布”描述成“Cloudflare 后端已部署”。
+GitHub Pages 只发布前端静态文件，不会发布 `worker/` 中的 Worker，也不会创建 D1、Secrets 或 Cron。截至 2026-08-25，Worker 已由 Wrangler 首次部署并通过线上 API 验收；仓库的 `.github/workflows/deploy-worker.yml` 仍须用 Actions Secrets 和首次 main run 验证后续自动部署。Worker、D1、VAPID Secrets 和 CI 说明见 [`DEPLOYMENT.md`](./DEPLOYMENT.md)。Pages 与 Worker 的发布状态始终分别核验。
 
 ## 当前数据边界
 

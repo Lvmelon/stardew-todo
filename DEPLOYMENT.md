@@ -5,7 +5,7 @@
 1. **GitHub Pages**：发布静态前端到 `main` 根目录，站点路径为 `/stardew-todo/`；
 2. **Cloudflare Worker + D1**：提供共享任务镜像、留言、配对、Push 订阅、健康检查和 Cron。
 
-Pages 发布成功不代表 Worker、D1、Secrets 或 Cron 已部署。本文的命令是目标流程；在当前环境没有 Cloudflare 登录、D1 控制台和 iPhone 真机证据前，不声称后端或 Push 已上线。
+Pages 发布成功不代表 Worker、D1、Secrets 或 Cron 已部署。截至 2026-08-25，生产 Worker <https://stardew-todo-worker.stardew-todo.workers.dev>、D1 migration、VAPID Secrets 和每分钟 Cron trigger 已部署；线上 health、配对、镜像、留言、角色权限与 CORS 已验收。系统 Push 是否最终显示仍需 iPhone/PC 真机授权与到达测试；GitHub Actions 自动部署还必须以仓库 Secrets 配置和首次 main run 为证。
 
 ## 1. 先确认 Git 状态
 

@@ -7,9 +7,10 @@
 | 产品形态 | Vanilla JavaScript 静态 PWA + 可选 Cloudflare Worker/D1 |
 | 目标用户 | 一对希望轻松互相看见日常小事的人 |
 | 线上前端 | <https://lvmelon.github.io/stardew-todo/> |
-| 文档状态 | V1.0 目标与验收基线；实现、部署和真机能力须以实际证据更新 |
+| 线上 Worker | <https://stardew-todo-worker.stardew-todo.workers.dev> |
+| 文档状态 | V1.0 实现与验收基线；Worker API 已验收，前端发布与真机 Push 仍以实际证据更新 |
 
-这份文档收口 V1.0 的产品边界。它不把“共享任务镜像”包装成完整多设备 Todo 同步，也不把 Cloudflare、Web Push 或 iPhone 真机能力写成尚未验证的既成事实。
+这份文档收口 V1.0 的产品边界。它不把“共享任务镜像”包装成完整多设备 Todo 同步。Cloudflare Worker/D1 的部署与 API 验收已记录，但这不等同于 Web Push 已在真实 iPhone/PC 上最终展示。
 
 ## 1. 产品目标
 

@@ -27,7 +27,7 @@ V1.0 采用“任务本地存储 + 云端共享镜像”，不是完整的多设
 - Service Worker 应用壳缓存；
 - Web App Manifest、Apple 主屏幕图标和 GitHub Pages 项目子路径兼容。
 
-V1.0 的 Worker、D1、Web Push、天气、声音、共享镜像和更新提示，必须以代码、测试和线上响应分别验收；本 README 不把尚未验收的目标写成已经部署的事实。
+截至 2026-08-25，V1.0 Worker 已部署到 <https://stardew-todo-worker.stardew-todo.workers.dev>，远端 D1 migration、VAPID Secrets、Cron trigger、健康检查、配对、共享镜像、伙伴只读权限、留言与 CORS 已通过线上响应验收。iPhone/PC 的系统通知展示仍需真实设备授权与到达测试，不能由 API 成功外推。
 
 ## 本地运行
 
@@ -50,7 +50,7 @@ python -m http.server 4173
 - 本地任务、设置、设备凭据和备份由浏览器站点数据管理；清除站点数据或更换设备可能丢失本地主数据。
 - 使用共享空间时，D1 只保存共享任务镜像、留言、空间/成员授权摘要和 Web Push 所需数据，不保存天气、BGM、动画等纯本地设置。
 - 配对链接和恢复码是 bearer capability：拿到它的人可能加入空间。它们不放在 URL query、日志或分析事件中；链接只通过 URL fragment 传递，读取后立即清理地址栏。
-- 当前仓库不包含真实 Cloudflare、VAPID 或其他密钥。提交前检查 `.env.example` 之外的文件，真实值通过 `wrangler secret` 和 GitHub Actions Secrets 注入。
+- 当前仓库只包含公开 Worker URL 和 D1 binding ID，不包含 Cloudflare token、VAPID 私钥或空间凭据。提交前检查 `.env.example` 之外的文件；真实密钥通过 `wrangler secret` 和 GitHub Actions Secrets 注入。
 
 安全边界、威胁模型和事件处理见 [`SECURITY.md`](./SECURITY.md)。
 
