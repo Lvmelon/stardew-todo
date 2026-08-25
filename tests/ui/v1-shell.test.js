@@ -19,11 +19,20 @@ describe('V1.0 application shell', () => {
   it('uses one greeting heart and provides gentle ambient scene layers', async () => {
     const document = await loadDocument();
     const styles = await readFile(`${process.cwd()}/styles.css`, 'utf8');
+    const appSource = await readFile(`${process.cwd()}/app.js`, 'utf8');
     expect(document.querySelectorAll('#greeting-cover [aria-hidden="true"]').length).toBe(0);
     expect(document.querySelector('#ambient-life-layer')).not.toBeNull();
     expect(document.querySelector('.couple-heart')).not.toBeNull();
+    expect(document.querySelectorAll('.pixel-butterfly').length).toBeGreaterThanOrEqual(2);
     expect(document.querySelectorAll('.ambient-mote').length).toBeGreaterThanOrEqual(3);
     expect(document.querySelector('#ambient-motion-enabled')).not.toBeNull();
+    expect(document.querySelector('#ambient-motion-status')).not.toBeNull();
+    expect(document.querySelector('#bgm-play')).not.toBeNull();
+    expect(styles).toContain('@keyframes butterflyFlight');
+    expect(document.querySelector('link[rel="stylesheet"]')?.getAttribute('href')).toBe('styles.css?v=1.0.3');
+    expect(document.querySelector('script[type="module"]')?.getAttribute('src')).toBe('app.js?v=1.0.3');
+    expect(appSource).toContain("'./update-manager.js?v=1.0.3'");
+    expect(appSource).toContain("'./config.js?v=1.0.3'");
     expect(styles).toMatch(/@media\s*\(prefers-reduced-motion:reduce\)\s*\{#ambient-life-layer\{display:none!important\}\}/);
   });
 
@@ -48,6 +57,6 @@ describe('V1.0 application shell', () => {
     expect(document.querySelector('#shared-modal')).not.toBeNull();
     expect(document.querySelector('#comment-form')).not.toBeNull();
     expect(document.querySelector('#update-banner')).not.toBeNull();
-    expect(document.querySelector('#app-version')?.textContent).toContain('V1.0.2');
+    expect(document.querySelector('#app-version')?.textContent).toContain('V1.0.3');
   });
 });

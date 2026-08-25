@@ -196,6 +196,89 @@ describe('V1 application sharing consent', () => {
     expect(document.body.classList.contains('ambient-motion-off')).toBe(false);
   });
 
+  it('explains when the system reduces motion', async () => {
+    const store = new AppStore();
+    const app = createApplication({
+      documentImpl: document,
+      navigatorImpl: {},
+      store,
+      matchMediaImpl: () => ({ matches: true }),
+      shareClient: { async getCredentials() { return null; } },
+      shareSync: { bindLifecycle() {}, async retryPending() { return { tasks: [], comments: [] }; }, async getCachedSharedTasks() { return []; } },
+      notificationClient: { permission: () => 'default', support: () => ({ supported: false }) },
+      weatherService: { getCached: () => null },
+      audioManager: { setEnabled() {}, setVolume() {} },
+    });
+    await app.initialize();
+
+    expect(document.querySelector('#ambient-motion-status').textContent).toContain('减少动态效果');
+  });
+
+  it('starts BGM inside the enabling gesture before asynchronous settings persistence', async () => {
+    const store = new AppStore();
+    let finishSave;
+    store.setSettings = value => new Promise(resolve => {
+      finishSave = () => { store.settings = structuredClone(value); resolve(); };
+    });
+    const audioManager = {
+      setEnabled: vi.fn(),
+      setVolume: vi.fn(),
+      startFromGesture: vi.fn(async () => ({ ok: true })),
+      stop: vi.fn(async () => ({ ok: true })),
+    };
+    const app = createApplication({
+      documentImpl: document,
+      navigatorImpl: {},
+      store,
+      shareClient: { async getCredentials() { return null; } },
+      shareSync: { bindLifecycle() {}, async retryPending() { return { tasks: [], comments: [] }; }, async getCachedSharedTasks() { return []; } },
+      notificationClient: { permission: () => 'default', support: () => ({ supported: false }) },
+      weatherService: { getCached: () => null },
+      audioManager,
+    });
+    await app.initialize();
+
+    const input = document.querySelector('#bgm-enabled');
+    input.checked = true;
+    input.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+    expect(audioManager.setEnabled).toHaveBeenCalledWith(true);
+    expect(audioManager.startFromGesture).toHaveBeenCalledTimes(1);
+    await tick();
+    finishSave?.();
+    await tick();
+    expect(store.settings.bgmEnabled).toBe(true);
+  });
+
+  it('resumes an enabled local BGM preference on the next page gesture', async () => {
+    const store = new AppStore();
+    store.settings = { bgmEnabled: true, volume: 0.4 };
+    const audioManager = {
+      setEnabled: vi.fn(),
+      setVolume: vi.fn(),
+      startFromGesture: vi.fn(async () => ({ ok: true })),
+      stop: vi.fn(async () => ({ ok: true })),
+      isRunning: vi.fn(() => false),
+    };
+    const app = createApplication({
+      documentImpl: document,
+      navigatorImpl: {},
+      store,
+      shareClient: { async getCredentials() { return null; } },
+      shareSync: { bindLifecycle() {}, async retryPending() { return { tasks: [], comments: [] }; }, async getCachedSharedTasks() { return []; } },
+      notificationClient: { permission: () => 'default', support: () => ({ supported: false }) },
+      weatherService: { getCached: () => null },
+      audioManager,
+    });
+    await app.initialize();
+
+    document.querySelector('#settings-button').click();
+    await tick();
+
+    expect(audioManager.startFromGesture).toHaveBeenCalledTimes(1);
+    expect(document.querySelector('#bgm-status').textContent).toContain('正在播放');
+  });
+
   it('opens the owned task when a notification click message reaches the page', async () => {
     const store = new AppStore([{
       id: 'task-from-push', title: '取快递', description: '下班路上', dueDate: '2026-08-25', status: 'open',

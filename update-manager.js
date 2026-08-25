@@ -16,6 +16,8 @@ export function createUpdateManager(options = {}) {
   let started = false;
   let removeControllerListener = null;
   let removeUpdateListener = null;
+  let removeRegistrationListener = null;
+  let watchedRegistration = null;
 
   function notify(worker) {
     waitingWorker = worker;
@@ -26,12 +28,26 @@ export function createUpdateManager(options = {}) {
 
   function inspect(currentRegistration) {
     registration = currentRegistration;
+    watchRegistration(registration);
     if (registration?.waiting) notify(registration.waiting);
     const installing = registration?.installing;
     if (installing) watchInstalling(installing);
   }
 
+  function watchRegistration(currentRegistration) {
+    if (!currentRegistration?.addEventListener || watchedRegistration === currentRegistration) return;
+    removeRegistrationListener?.();
+    watchedRegistration = currentRegistration;
+    const updateFound = () => {
+      const installing = currentRegistration.installing;
+      if (installing) watchInstalling(installing);
+    };
+    currentRegistration.addEventListener('updatefound', updateFound);
+    removeRegistrationListener = () => currentRegistration.removeEventListener?.('updatefound', updateFound);
+  }
+
   function watchInstalling(installing) {
+    removeUpdateListener?.();
     const stateChange = () => {
       if (installing.state === 'installed' && serviceWorker?.controller) notify(installing);
     };
@@ -85,8 +101,11 @@ export function createUpdateManager(options = {}) {
   function stop() {
     removeControllerListener?.();
     removeUpdateListener?.();
+    removeRegistrationListener?.();
     removeControllerListener = null;
     removeUpdateListener = null;
+    removeRegistrationListener = null;
+    watchedRegistration = null;
     started = false;
   }
 

@@ -1,4 +1,4 @@
-const CACHE = 'stardew-todo-v1.0.2-1';
+const CACHE = 'stardew-todo-v1.0.3-1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -44,7 +44,7 @@ self.addEventListener('message', event => {
     self.skipWaiting();
   }
   if (message.type === 'GET_VERSION') {
-    event.source?.postMessage({ type: 'APP_VERSION', version: '1.0.2', cache: CACHE });
+    event.source?.postMessage({ type: 'APP_VERSION', version: '1.0.3', cache: CACHE });
   }
   if (message.type === 'TEST_NOTIFICATION') {
     event.waitUntil(self.registration.showNotification('今日任务', {
@@ -70,7 +70,7 @@ async function networkFirstNavigation(request) {
 
 async function cacheFirstWithRefresh(request, event) {
   const cache = await caches.open(CACHE);
-  const cached = await cache.match(request);
+  const cached = await cache.match(request, { ignoreSearch: true });
   const refresh = fetch(request).then(async response => {
     if (response.ok) await cache.put(request, response.clone());
     return response;

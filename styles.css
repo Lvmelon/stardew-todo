@@ -61,16 +61,19 @@ button{touch-action:manipulation}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 #scene-art{transition:filter .45s ease}
 #ambient-life-layer{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none}
-.couple-heart{position:absolute;left:50.5%;top:71.8%;font-style:normal;font-size:clamp(12px,3.6vw,18px);line-height:1;color:#d85f67;text-shadow:1px 1px 0 #7a3428;opacity:0;animation:coupleHeartFloat 9s ease-in-out 1.8s infinite}
-.ambient-mote{position:absolute;width:3px;height:3px;background:#ffe38a;box-shadow:0 0 0 1px rgba(116,82,35,.18),0 0 5px rgba(255,226,126,.68);opacity:0;animation:ambientMoteDrift var(--mote-duration,8s) ease-in-out var(--mote-delay,0s) infinite}
+.couple-heart{position:absolute;left:50.5%;top:70.8%;font-style:normal;font-size:clamp(16px,4.8vw,23px);line-height:1;color:#d85f67;text-shadow:1px 1px 0 #7a3428;opacity:0;animation:coupleHeartFloat 7.2s ease-in-out .4s infinite}
+.ambient-mote{position:absolute;width:4px;height:4px;background:#ffe38a;box-shadow:0 0 0 1px rgba(116,82,35,.22),0 0 6px rgba(255,226,126,.78);opacity:0;animation:ambientMoteDrift var(--mote-duration,8s) ease-in-out var(--mote-delay,0s) infinite}
 .mote-one{left:20%;top:78%;--mote-duration:8.5s;--mote-delay:.5s}.mote-two{left:69%;top:76%;--mote-duration:10s;--mote-delay:2.3s}.mote-three{left:81%;top:87%;--mote-duration:7.5s;--mote-delay:4.1s}.mote-four{left:31%;top:90%;--mote-duration:9.5s;--mote-delay:5.2s}
-.chimney-smoke{position:absolute;left:5.2%;top:27.6%;width:7px;height:7px;border-radius:40%;background:rgba(244,238,213,.58);box-shadow:4px -3px 0 rgba(239,232,208,.28);opacity:0;animation:chimneySmokeRise 6.6s ease-out infinite}
+.chimney-smoke{position:absolute;left:5.2%;top:27.6%;width:9px;height:9px;border-radius:35%;background:rgba(250,244,220,.72);box-shadow:5px -4px 0 rgba(244,237,213,.46),-3px 2px 0 rgba(226,219,199,.28);opacity:0;animation:chimneySmokeRise 6.6s ease-out infinite}
 .smoke-two{animation-delay:2.2s}.smoke-three{animation-delay:4.4s}
+.pixel-butterfly{position:absolute;left:-8%;top:81%;width:3px;height:4px;background:#56351f;opacity:0;filter:drop-shadow(1px 1px 0 rgba(71,42,24,.35));animation:butterflyFlight 12s linear infinite}.pixel-butterfly::before,.pixel-butterfly::after{content:"";position:absolute;top:-2px;width:5px;height:5px;background:#f3c34e;animation:butterflyWing .34s steps(2,end) infinite}.pixel-butterfly::before{right:3px;transform-origin:right center}.pixel-butterfly::after{left:3px;transform-origin:left center;background:#ef8d59}.butterfly-two{top:88%;animation-delay:-5.5s;animation-duration:15s;filter:hue-rotate(62deg) drop-shadow(1px 1px 0 rgba(71,42,24,.35))}
 body[data-time-mood="night"] .ambient-mote{background:#ffed91;box-shadow:0 0 6px 2px rgba(255,224,112,.72)}
 body.ambient-motion-off #ambient-life-layer{display:none}
-@keyframes coupleHeartFloat{0%,68%,100%{opacity:0;transform:translate(-50%,10px) scale(.65)}73%{opacity:.9}82%{opacity:1;transform:translate(-50%,-5px) scale(1)}92%{opacity:0;transform:translate(-50%,-21px) scale(.82)}}
+@keyframes coupleHeartFloat{0%,28%,100%{opacity:0;transform:translate(-50%,10px) scale(.68)}38%{opacity:.95}62%{opacity:1;transform:translate(-50%,-7px) scale(1)}82%{opacity:0;transform:translate(-50%,-25px) scale(.84)}}
 @keyframes ambientMoteDrift{0%,100%{opacity:0;transform:translate(0,6px)}25%{opacity:.35}55%{opacity:.72;transform:translate(8px,-8px)}80%{opacity:.18;transform:translate(-4px,-16px)}}
 @keyframes chimneySmokeRise{0%{opacity:0;transform:translate(0,8px) scale(.65)}18%{opacity:.5}70%{opacity:.18;transform:translate(10px,-28px) scale(1.35)}100%{opacity:0;transform:translate(15px,-43px) scale(1.65)}}
+@keyframes butterflyFlight{0%{left:-8%;opacity:0;transform:translateY(8px)}8%{opacity:1}24%{left:22%;transform:translateY(-10px)}48%{left:50%;transform:translateY(7px)}72%{left:78%;transform:translateY(-13px)}92%{opacity:1}100%{left:108%;opacity:0;transform:translateY(2px)}}
+@keyframes butterflyWing{50%{transform:scaleX(.35)}}
 #atmosphere-layer{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:4;overflow:hidden}
 #atmosphere-layer::before,.cloud-wash,.rain-field,.snow-field{grid-area:1/1;width:min(100vw,460px,calc((100vh - 28px) * .5628));aspect-ratio:941/1672;pointer-events:none}
 #atmosphere-layer::before{content:"";z-index:1;transition:background .45s ease}

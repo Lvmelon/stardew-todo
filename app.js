@@ -28,12 +28,12 @@ import {
 import { createShareClient, readPairFragment, clearPairFragment } from './share-client.js';
 import { createShareSync } from './share-sync.js';
 import { createNotificationClient } from './notification-client.js';
-import { createUpdateManager } from './update-manager.js';
+import { createUpdateManager } from './update-manager.js?v=1.0.3';
 import { createWeatherService, applyWeatherClass } from './weather.js';
 import { applyAtmosphereClass, getAtmosphere } from './atmosphere.js';
 import { createAudioManager } from './audio-manager.js';
 import { applyPlantGrowth } from './plant-growth.js';
-import { APP_VERSION, CONFIG } from './config.js';
+import { APP_VERSION, CONFIG } from './config.js?v=1.0.3';
 
 const HOME_LIMIT = 5;
 const DEFAULT_TASK_TITLES = [
@@ -168,6 +168,7 @@ export function createApplication(options = {}) {
   const documentImpl = options.documentImpl || globalThis.document;
   if (!documentImpl) return Object.freeze({ initialize: async () => undefined });
   const navigatorImpl = options.navigatorImpl || globalThis.navigator || {};
+  const matchMediaImpl = options.matchMediaImpl || globalThis.matchMedia?.bind(globalThis);
   const store = options.store || createTaskStore();
 
   const $ = id => documentImpl.getElementById(id);
@@ -976,7 +977,20 @@ export function createApplication(options = {}) {
       else element.value = value ?? '';
     }
     updateNotificationStatus();
+    updateBgmStatus();
     void refreshSpaceStatus();
+  }
+
+  function updateBgmStatus(message = '') {
+    const status = $('bgm-status');
+    if (!status) return;
+    if (message) {
+      setStatus(status, message);
+      return;
+    }
+    setStatus(status, settings.bgmEnabled
+      ? '此设备已开启；重新打开应用后，点一下页面即可继续播放。'
+      : '每台设备需要单独开启；默认不会自动播放。');
   }
 
   async function applyWeather(weather) {
@@ -999,6 +1013,15 @@ export function createApplication(options = {}) {
       seasonKey: settings.seasonalAtmosphere ? atmosphere.seasonKey : 'summer',
     });
     body.classList.toggle('ambient-motion-off', settings.ambientMotion !== true);
+    const reducedMotion = Boolean(matchMediaImpl?.('(prefers-reduced-motion: reduce)')?.matches);
+    const motionStatus = $('ambient-motion-status');
+    if (motionStatus) {
+      setStatus(motionStatus, !settings.ambientMotion
+        ? '场景小动画已关闭。'
+        : reducedMotion
+          ? '系统已开启“减少动态效果”，场景动画已暂停。'
+          : '烟囱、蝴蝶和草地会轻轻动起来。');
+    }
     const plant = $('plant-progress');
     if (plant) {
       if (settings.plantGrowth) {
@@ -1392,12 +1415,29 @@ export function createApplication(options = {}) {
     });
     on('role-label-input', 'change', event => { void persistSetting({ displayName: event.target.value }); });
     on('bgm-enabled', 'change', async event => {
-      await persistSetting({ bgmEnabled: event.target.checked });
-      audioManager.setEnabled(event.target.checked);
-      if (event.target.checked) {
-        const result = await audioManager.startFromGesture();
-        if (!result.ok) showToast('当前设备暂时无法播放声音');
-      } else await audioManager.stop();
+      const enabled = event.target.checked;
+      audioManager.setEnabled(enabled);
+      const playback = enabled ? audioManager.startFromGesture() : audioManager.stop();
+      await persistSetting({ bgmEnabled: enabled });
+      const result = await playback;
+      if (enabled && !result.ok) {
+        updateBgmStatus('没有开始播放，请检查媒体音量后点“播放一下”。');
+        showToast('没有开始播放，请点“播放一下”重试');
+      } else if (enabled) updateBgmStatus('正在播放；此设置只保存在这台设备。');
+    });
+    on('bgm-play', 'click', async () => {
+      const checkbox = $('bgm-enabled');
+      if (checkbox) checkbox.checked = true;
+      audioManager.setEnabled(true);
+      audioManager.setVolume(settings.volume);
+      const playback = audioManager.startFromGesture();
+      await persistSetting({ bgmEnabled: true });
+      const result = await playback;
+      if (result.ok) updateBgmStatus('正在播放；此设置只保存在这台设备。');
+      else {
+        updateBgmStatus('没有开始播放，请检查媒体音量或静音状态后重试。');
+        showToast('当前设备还没有开始播放');
+      }
     });
     on('bgm-volume', 'input', event => {
       audioManager.setVolume(event.target.value);
@@ -1460,10 +1500,20 @@ export function createApplication(options = {}) {
     initialized = true;
     await buildClients();
     settings = await loadSettings(store);
+    audioManager.setVolume(settings.volume);
+    audioManager.setEnabled(settings.bgmEnabled);
     await seedIfNeeded();
     sharedTasks = await store.getSharedTasks().catch(() => []);
     updateCalendar();
     bindEvents();
+    documentImpl.addEventListener('click', event => {
+      if (event.target === $('bgm-enabled') || event.target === $('bgm-play')) return;
+      if (!settings.bgmEnabled || audioManager.isRunning?.()) return;
+      audioManager.setEnabled(true);
+      void audioManager.startFromGesture().then(result => {
+        if (result.ok) updateBgmStatus('正在播放；此设置只保存在这台设备。');
+      });
+    });
     updateSettingsUI();
     renderHomeTasks();
     renderSharedTasks();

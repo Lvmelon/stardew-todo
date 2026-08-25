@@ -338,8 +338,9 @@ IndexedDB schema 升级保留 V0.5 store 和所有任务字段；localStorage fa
 
 - 天气、自动定位/手动位置、时间/季节/天气效果、场景小动画、完成动画、BGM 开关/音量只存本机；定位不进入 D1。
 - BGM 用 Web Audio API 生成的原创 procedural 音色，必须由用户点击启动，且不复用 Stardew Valley 或其他第三方音乐/音效。
-- 主场景 `assets/scene.webp`、公告板位置和羊皮纸/木质语言保持为视觉锚点；场景动态只用独立 CSS 覆盖层，不移动主图或交互覆盖层，并遵守 `prefers-reduced-motion`。
-- 更新提示由页面与 Service Worker 协作：安装、控制、用户确认三个状态分别处理，不强制在编辑中刷新。
+- 主场景 `assets/scene.webp`、公告板位置和羊皮纸/木质语言保持为视觉锚点；场景动态只用独立 CSS 覆盖层，不移动主图或交互覆盖层，并遵守 `prefers-reduced-motion`，设置页会说明系统是否因此暂停动画。
+- 更新提示由页面与 Service Worker 协作：监听注册对象的 `updatefound` 和安装状态，再由用户确认切换 Worker；关键 CSS/入口模块使用发布版本查询参数，避免旧 Worker 首次打开仍返回上一版资源。
+- BGM 开启时在点击处理的第一个异步等待之前创建或恢复 AudioContext；偏好开启后，每次重新进入 PWA 可由下一次页面点击恢复播放。
 
 ## 12. CI、部署和可观测性
 

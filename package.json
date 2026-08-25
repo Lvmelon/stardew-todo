@@ -1,6 +1,6 @@
 {
   "name": "stardew-todo-pwa",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "type": "module",
   "description": "今日任务 · 像素田园待办 V1.0",
