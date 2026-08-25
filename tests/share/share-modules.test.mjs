@@ -130,6 +130,22 @@ async function testMissingApiBaseNeverFallsBackToPageOrigin() {
   assert.equal(called, false);
 }
 
+async function testShareRequestTimeoutIsVisible() {
+  const client = createShareClient({
+    store: new FakeStore(),
+    config: { apiBaseUrl: 'https://worker.example.test' },
+    requestTimeoutMs: 5,
+    fetchImpl: (_url, init) => new Promise((_resolve, reject) => {
+      init.signal?.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })));
+      setTimeout(() => reject(new Error('test guard timeout')), 60);
+    }),
+  });
+  await assert.rejects(
+    client.health(),
+    error => error.code === 'request-timeout' && error.message.includes('网络'),
+  );
+}
+
 async function testNotificationsDoNotPromptOnConstruction() {
   let permissionCalls = 0;
   let registered = 0;
@@ -200,6 +216,7 @@ await testPendingTaskShareAndCommentRetry();
 await testSecureRandomRequirement();
 await testRecoveryCodeCarriesSpaceId();
 await testMissingApiBaseNeverFallsBackToPageOrigin();
+await testShareRequestTimeoutIsVisible();
 await testNotificationsDoNotPromptOnConstruction();
 await testNotificationLocalFallback();
 await testWaitingWorkerControl();

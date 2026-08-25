@@ -34,10 +34,10 @@ describe('V1.0 application shell', () => {
     expect(styles).toContain('@keyframes butterflyFlight');
     expect(styles).toContain('@keyframes birdCross');
     expect(styles).toContain('@keyframes leafTumble');
-    expect(document.querySelector('link[rel="stylesheet"]')?.getAttribute('href')).toBe('styles.css?v=1.0.4');
-    expect(document.querySelector('script[type="module"]')?.getAttribute('src')).toBe('app.js?v=1.0.4');
-    expect(appSource).toContain("'./update-manager.js?v=1.0.4'");
-    expect(appSource).toContain("'./config.js?v=1.0.4'");
+    expect(document.querySelector('link[rel="stylesheet"]')?.getAttribute('href')).toBe('styles.css?v=1.0.5');
+    expect(document.querySelector('script[type="module"]')?.getAttribute('src')).toBe('app.js?v=1.0.5');
+    expect(appSource).toContain("'./update-manager.js?v=1.0.5'");
+    expect(appSource).toContain("'./config.js?v=1.0.5'");
     expect(styles).toMatch(/@media\s*\(prefers-reduced-motion:reduce\)\s*\{#ambient-life-layer\{display:none!important\}\}/);
   });
 
@@ -62,6 +62,6 @@ describe('V1.0 application shell', () => {
     expect(document.querySelector('#shared-modal')).not.toBeNull();
     expect(document.querySelector('#comment-form')).not.toBeNull();
     expect(document.querySelector('#update-banner')).not.toBeNull();
-    expect(document.querySelector('#app-version')?.textContent).toContain('V1.0.4');
+    expect(document.querySelector('#app-version')?.textContent).toContain('V1.0.5');
   });
 });

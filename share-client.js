@@ -50,6 +50,9 @@ export function createShareClient(options = {}) {
   const locationImpl = options.locationImpl || globalThis.location;
   const historyImpl = options.historyImpl || globalThis.history;
   const config = getRuntimeConfig(options.config || CONFIG);
+  const AbortControllerImpl = options.AbortControllerImpl || globalThis.AbortController;
+  const configuredTimeout = Number(options.requestTimeoutMs);
+  const requestTimeoutMs = Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 15000;
   const memoryMeta = new Map();
 
   if (typeof fetchImpl !== 'function') {
@@ -125,12 +128,35 @@ export function createShareClient(options = {}) {
     const requestHeaders = { Accept: 'application/json', ...headers };
     if (body !== undefined) requestHeaders['Content-Type'] = 'application/json';
     if (auth) requestHeaders.Authorization = `Bearer ${credentials.accessToken}`;
-    const response = await fetchImpl(url, {
-      method,
-      headers: requestHeaders,
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal,
-    });
+    const controller = typeof AbortControllerImpl === 'function' ? new AbortControllerImpl() : null;
+    let timedOut = false;
+    const forwardAbort = () => controller?.abort(signal?.reason);
+    if (signal?.aborted) forwardAbort();
+    else signal?.addEventListener?.('abort', forwardAbort, { once: true });
+    const timeoutId = controller ? setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, requestTimeoutMs) : null;
+    let response;
+    try {
+      response = await fetchImpl(url, {
+        method,
+        headers: requestHeaders,
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal: controller?.signal || signal,
+      });
+    } catch (error) {
+      if (timedOut) {
+        throw new ShareClientError('网络连接超时，请检查网络后再试', { code: 'request-timeout' });
+      }
+      if (signal?.aborted || error?.name === 'AbortError') {
+        throw new ShareClientError('请求已取消', { code: 'request-aborted' });
+      }
+      throw new ShareClientError('无法连接情侣空间服务，请检查当前网络', { code: 'network-error' });
+    } finally {
+      if (timeoutId !== null) clearTimeout(timeoutId);
+      signal?.removeEventListener?.('abort', forwardAbort);
+    }
     const payload = await readResponse(response);
     if (!response.ok) {
       throw new ShareHttpError(response.status, safeErrorMessage(payload, response.status), payload);

@@ -28,12 +28,12 @@ import {
 import { createShareClient, readPairFragment, clearPairFragment } from './share-client.js';
 import { createShareSync } from './share-sync.js';
 import { createNotificationClient } from './notification-client.js';
-import { createUpdateManager } from './update-manager.js?v=1.0.4';
+import { createUpdateManager } from './update-manager.js?v=1.0.5';
 import { createWeatherService, applyWeatherClass } from './weather.js';
 import { applyAtmosphereClass, getAtmosphere } from './atmosphere.js';
 import { createAudioManager } from './audio-manager.js';
 import { applyPlantGrowth } from './plant-growth.js';
-import { APP_VERSION, CONFIG } from './config.js?v=1.0.4';
+import { APP_VERSION, CONFIG } from './config.js?v=1.0.5';
 
 const HOME_LIMIT = 5;
 const DEFAULT_TASK_TITLES = [
@@ -220,6 +220,7 @@ export function createApplication(options = {}) {
   let confirmAction = null;
   let latestPairLink = '';
   let latestRecoveryCode = '';
+  let creatingSpace = false;
   let spaceConnected = false;
   let initialized = false;
   let updateManager = null;
@@ -665,7 +666,7 @@ export function createApplication(options = {}) {
     const last = $('last-share-sync');
     if (!credentials?.spaceId) {
       spaceConnected = false;
-      setStatus(status, '尚未连接');
+      setStatus(status, creatingSpace ? '正在创建空间…' : '尚未连接');
       setHidden($('copy-pair-link'), true);
       setHidden($('show-recovery-code'), true);
     } else {
@@ -786,10 +787,19 @@ export function createApplication(options = {}) {
   }
 
   async function createSpace() {
+    if (creatingSpace) return;
     if (!shareClient) {
       showToast('共享服务尚未配置');
       return;
     }
+    const button = $('create-space');
+    creatingSpace = true;
+    if (button) {
+      button.disabled = true;
+      button.textContent = '正在创建…';
+      button.setAttribute('aria-busy', 'true');
+    }
+    setStatus($('space-status'), '正在创建空间…');
     try {
       const credentials = await shareClient.createSpace({ displayName: settings.displayName });
       await prepareExistingTasksForSpace(credentials);
@@ -799,7 +809,15 @@ export function createApplication(options = {}) {
       await refreshSpaceStatus();
       offerExistingTaskShare('我们的空间已经创建好了');
     } catch (error) {
+      setStatus($('space-status'), '创建失败，请检查网络后重试');
       showToast(error?.message || '创建空间失败');
+    } finally {
+      creatingSpace = false;
+      if (button) {
+        button.disabled = false;
+        button.textContent = '创建我们的空间';
+        button.removeAttribute('aria-busy');
+      }
     }
   }
 

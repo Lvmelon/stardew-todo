@@ -102,6 +102,53 @@ describe('V1 application sharing consent', () => {
     expect(syncExistingTasks).toHaveBeenCalledTimes(1);
   });
 
+  it('shows creation progress immediately and prevents duplicate space requests', async () => {
+    const store = new AppStore();
+    let credentials = null;
+    let resolveCreate;
+    const createSpace = vi.fn(() => new Promise(resolve => { resolveCreate = resolve; }));
+    const shareClient = {
+      async getCredentials() { return credentials; },
+      createSpace,
+      buildPairLink: () => 'https://example.test/#pair=descriptor',
+      buildRecoveryCode: () => 'recovery-descriptor',
+    };
+    const app = createApplication({
+      documentImpl: document,
+      navigatorImpl: {},
+      store,
+      shareClient,
+      shareSync: { bindLifecycle() {}, async retryPending() { return { tasks: [], comments: [] }; } },
+      notificationClient: { permission: () => 'default', support: () => ({ supported: false }) },
+      weatherService: { getCached: () => null },
+      audioManager: { setEnabled() {}, setVolume() {} },
+    });
+    await app.initialize();
+
+    const button = document.querySelector('#create-space');
+    button.click();
+    button.click();
+    await tick();
+
+    expect(createSpace).toHaveBeenCalledTimes(1);
+    expect(button.disabled).toBe(true);
+    expect(button.textContent).toBe('正在创建…');
+    expect(document.querySelector('#space-status').textContent).toContain('正在创建');
+
+    credentials = {
+      spaceId: 'space-1', deviceId: 'device-1', role: 'owner', accessToken: 'access-1',
+      pairSecret: 'pair-secret', recoveryCode: 'recovery-secret',
+      pairLink: 'https://example.test/#pair=descriptor', recoveryDescriptor: 'recovery-descriptor',
+    };
+    resolveCreate(credentials);
+    await tick();
+    await tick();
+
+    expect(button.disabled).toBe(false);
+    expect(button.textContent).toBe('创建我们的空间');
+    expect(document.querySelector('#space-status').textContent).toContain('已连接');
+  });
+
   it('keeps a route to future and completed tasks when the home board has no current task', async () => {
     const store = new AppStore([
       {
