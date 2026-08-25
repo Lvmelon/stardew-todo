@@ -342,9 +342,9 @@ IndexedDB schema 升级保留 V0.5 store 和所有任务字段；localStorage fa
 ## 12. CI、部署和可观测性
 
 - GitHub Pages：`main` + `/(root)`，只发布静态前端；资源路径必须兼容 `/stardew-todo/`。
-- Worker：`worker/wrangler.jsonc` + D1 migrations；当前 `.github/workflows/deploy-worker.yml` 设计为在 `main` 更新 Worker 文件时先应用远程 migration，再部署 Worker，但 Actions 是否成功仍须现场核验。
+- Worker：`worker/wrangler.jsonc` + D1 migrations；`.github/workflows/deploy-worker.yml` 在 `main` 更新 Worker 文件时先应用远程 migration，再部署 Worker，2026-08-25 main run `32803946732` 已现场核验成功。
 - CI：`.github/workflows/ci.yml` 负责前端和 Worker 的 lint、语法、测试与 Wrangler dry-run；它不能替代真实 D1、Cron 或 Push 验收。
-- CI secret 至少包括 `CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`；VAPID 私钥只使用 `wrangler secret` 或 CI secret，不进 Git。
+- CI secret 包括 `CLOUDFLARE_API_TOKEN`；`CLOUDFLARE_ACCOUNT_ID` 是已核实并版本化的公开路由标识。VAPID 私钥只使用 `wrangler secret` 或 CI secret，不进 Git。
 - CI 分别运行前端语法/测试、Worker node check/测试、migration dry-run 或结构校验；部署成功不等于 API、Cron 或 Push 已实际工作。
 - `/health` 不返回密钥；日志只记录 request id、route、状态码、耗时和匿名错误类别，不记录 Authorization、pair/recovery token、任务全文或留言全文。
 

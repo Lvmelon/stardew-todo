@@ -5,7 +5,7 @@
 1. **GitHub Pages**：发布静态前端到 `main` 根目录，站点路径为 `/stardew-todo/`；
 2. **Cloudflare Worker + D1**：提供共享任务镜像、留言、配对、Push 订阅、健康检查和 Cron。
 
-Pages 发布成功不代表 Worker、D1、Secrets 或 Cron 已部署。截至 2026-08-25，生产 Worker <https://stardew-todo-worker.stardew-todo.workers.dev>、D1 migration、VAPID Secrets 和每分钟 Cron trigger 已部署；线上 health、配对、镜像、留言、角色权限与 CORS 已验收。系统 Push 是否最终显示仍需 iPhone/PC 真机授权与到达测试；GitHub Actions 自动部署还必须以仓库 Secrets 配置和首次 main run 为证。
+Pages 发布成功不代表 Worker、D1、Secrets 或 Cron 已部署。截至 2026-08-25，生产 Worker <https://stardew-todo-worker.stardew-todo.workers.dev>、D1 migration、VAPID Secrets 和每分钟 Cron trigger 已部署；线上 health、配对、镜像、留言、角色权限与 CORS 已验收。GitHub Actions 已在 main run `32803946732` 中完成远程 D1 migration、Worker deploy 和 health check，Pages run `32803945423` 与 CI run `32803946800` 同时成功。系统 Push 是否最终显示仍需 iPhone/PC 真机授权与到达测试。
 
 ## 1. 先确认 Git 状态
 
@@ -157,11 +157,12 @@ iPhone 需先把 Pages HTTPS 网站添加到主屏幕，再在用户点击后申
 
 ## 8. GitHub Actions 自动部署 Worker
 
-仓库当前已包含 `.github/workflows/ci.yml` 和 `.github/workflows/deploy-worker.yml`。文件存在不等于 workflow 已成功运行；首次启用仍需由项目所有者配置 Secrets，并在 GitHub Actions 页面查看 run 结果。
+仓库当前已包含 `.github/workflows/ci.yml` 和 `.github/workflows/deploy-worker.yml`。自动部署已由手动验收 run `32803866834` 和 main push run `32803946732` 证明可用；后续仍须逐次查看 run 结果，不能用历史成功外推未来发布。
 
 `deploy-worker.yml` 的当前触发条件是：
 
 - push 到 `main` 且 `worker/**` 或该 workflow 改动；
+- `workflow_dispatch` 手动重跑指定 ref；
 - 当前文件没有把 Pull Request 部署到生产，PR 由 `ci.yml` 做检查/测试。
 
 Actions job 至少执行：
@@ -181,7 +182,7 @@ Actions job 至少执行：
 
 官方 CI 参考：[Cloudflare Workers GitHub Actions](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)、[GitHub Actions secrets](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)。
 
-当前 workflow 会先执行远程 D1 migration，再用 Wrangler Action 部署 Worker。“工作流文件已写入”不等于“Actions 成功运行”；必须查看 run 日志、Worker deployment、D1 migration 和 `/health` 响应。
+当前 workflow 会先执行远程 D1 migration，再用 Wrangler Action 部署 Worker。2026-08-25 的 main run `32803946732` 已验证该路径；仍必须对每次发布查看 run 日志、Worker deployment、D1 migration 和 `/health` 响应。
 
 ## 9. 发布顺序
 

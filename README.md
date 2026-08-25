@@ -27,7 +27,7 @@ V1.0 采用“任务本地存储 + 云端共享镜像”，不是完整的多设
 - Service Worker 应用壳缓存；
 - Web App Manifest、Apple 主屏幕图标和 GitHub Pages 项目子路径兼容。
 
-截至 2026-08-25，V1.0 Worker 已部署到 <https://stardew-todo-worker.stardew-todo.workers.dev>，远端 D1 migration、VAPID Secrets、Cron trigger、健康检查、配对、共享镜像、伙伴只读权限、留言与 CORS 已通过线上响应验收。iPhone/PC 的系统通知展示仍需真实设备授权与到达测试，不能由 API 成功外推。
+截至 2026-08-25，V1.0 前端已发布到 <https://lvmelon.github.io/stardew-todo/>，Worker 已部署到 <https://stardew-todo-worker.stardew-todo.workers.dev>。远端 D1 migration、VAPID Secrets、Cron trigger、健康检查、配对、共享镜像、伙伴只读权限、留言、CORS 和 GitHub Actions 自动部署已通过线上验收。iPhone/PC 的系统通知展示仍需真实设备授权与到达测试，不能由 API 成功外推。
 
 ## 本地运行
 

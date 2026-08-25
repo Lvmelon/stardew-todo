@@ -8,9 +8,9 @@
 | 目标用户 | 一对希望轻松互相看见日常小事的人 |
 | 线上前端 | <https://lvmelon.github.io/stardew-todo/> |
 | 线上 Worker | <https://stardew-todo-worker.stardew-todo.workers.dev> |
-| 文档状态 | V1.0 实现与验收基线；Worker API 已验收，前端发布与真机 Push 仍以实际证据更新 |
+| 文档状态 | V1.0 已发布；Pages、Worker API 和自动部署已验收，真机 Push 仍以实际设备证据更新 |
 
-这份文档收口 V1.0 的产品边界。它不把“共享任务镜像”包装成完整多设备 Todo 同步。Cloudflare Worker/D1 的部署与 API 验收已记录，但这不等同于 Web Push 已在真实 iPhone/PC 上最终展示。
+这份文档收口 V1.0 的产品边界。它不把“共享任务镜像”包装成完整多设备 Todo 同步。Cloudflare Worker/D1、GitHub Pages 和自动部署的验收已记录，但这不等同于 Web Push 已在真实 iPhone/PC 上最终展示。
 
 ## 1. 产品目标
 
@@ -330,11 +330,11 @@ V0.5 任务必须保留：`id`、`title`、`description`、`emoji`、旧 `dueDat
 
 ### 工程与发布
 
-- [ ] IndexedDB、localStorage fallback、迁移和刷新结果有自动化覆盖。
-- [ ] Worker route、鉴权、owner/partner 权限、D1 migration、索引查询、Cron claim 和 Web Push payload 有测试。
-- [ ] `node --check`/lint、单元测试、`git diff --check` 和浏览器实际验证通过。
-- [ ] Pages、Worker、D1、Cron 和 VAPID Secrets 的状态分别记录；没有证据的项目标为未验证。
-- [ ] 桌面和窄屏截图检查公告板、弹窗、设置、留言、通知状态和安全区。
+- [x] IndexedDB、localStorage fallback、迁移和刷新结果有自动化覆盖。
+- [x] Worker route、鉴权、owner/partner 权限、D1 migration、索引查询、Cron claim 和 Web Push payload 有测试。
+- [x] `node --check`/lint、单元测试、`git diff --check` 和浏览器实际验证通过。
+- [x] Pages、Worker、D1、Cron 和 VAPID Secrets 的状态分别记录；没有证据的项目标为未验证。
+- [x] 桌面和窄屏截图检查公告板、弹窗、设置、留言、通知状态和安全区。
 
 ## 14. 官方资料
 
